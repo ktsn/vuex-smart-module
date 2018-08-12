@@ -1,3 +1,2 @@
----
-  root: true
-  extends: ktsn-typescript
+root: true
+extends: ktsn-typescript

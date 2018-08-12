@@ -5,7 +5,11 @@ import {
   GetterTree,
   CommitOptions,
   DispatchOptions,
-  MutationTree
+  MutationTree,
+  mapState,
+  mapGetters,
+  mapMutations,
+  mapActions
 } from 'vuex'
 import { BG0, BM0, BA0, Payload } from './assets'
 import { get, assert, Class, mapValues } from './utils'
@@ -34,6 +38,14 @@ export interface Dispatch<A> {
   ): Promise<any>
 }
 
+export type MappedFunction<Fn, R> = Payload<Fn> extends undefined
+  ? (payload?: Payload<Fn>) => R
+  : (payload: Payload<Fn>) => R
+
+export type RestArgs<Fn> = Fn extends (_: any, ...args: infer R) => any
+  ? R
+  : never
+
 export interface ModuleOptions<S, G extends BG0, M extends BM0, A extends BA0> {
   state?: Class<S>
   getters?: Class<G>
@@ -47,18 +59,12 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
   private store: Store<any> | undefined = undefined
 
   commit: Commit<M> = (type: any, payload: any, options?: any): void => {
-    assert(
-      this.path && this.store,
-      'you need to provide the module into the Vuex store before using it.'
-    )
+    this.ensureStore()
     return this.normalizedDispatch(this.store!.commit, type, payload, options)
   }
 
   dispatch: Dispatch<A> = (type: any, payload: any, options?: any): any => {
-    assert(
-      this.path && this.store,
-      'you need to provide the module into the Vuex store before using it.'
-    )
+    this.ensureStore()
     return this.normalizedDispatch(this.store!.dispatch, type, payload, options)
   }
 
@@ -89,19 +95,70 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
     }
   }
 
+  mapState<K extends keyof S>(map: K[]): { [Key in K]: () => S[Key] }
+  mapState<T extends Record<string, keyof S>>(
+    map: T
+  ): { [Key in keyof T]: () => S[T[Key]] }
+  mapState<T extends Record<string, (state: S, getters: G) => any>>(
+    map: T
+  ): { [Key in keyof T]: () => ReturnType<T[Key]> }
+  mapState(map: any): { [key: string]: () => any } {
+    this.ensureStore()
+    const namespace = this.namespace()
+    return namespace === '' ? mapState(map) : mapState(namespace, map)
+  }
+
+  mapGetters<K extends keyof G>(map: K[]): { [Key in K]: () => G[Key] }
+  mapGetters<T extends Record<string, keyof G>>(
+    map: T
+  ): { [Key in keyof T]: () => G[T[Key]] }
+  mapGetters(map: any): { [key: string]: () => any } {
+    this.ensureStore()
+    const namespace = this.namespace()
+    return namespace === '' ? mapGetters(map) : mapGetters(namespace, map)
+  }
+
+  mapMutations<K extends keyof M>(
+    map: K[]
+  ): { [Key in K]: MappedFunction<M[K], void> }
+  mapMutations<T extends Record<string, keyof M>>(
+    map: T
+  ): { [Key in keyof T]: MappedFunction<M[T[Key]], void> }
+  mapMutations<
+    T extends Record<string, (commit: Commit<M>, ...args: any[]) => any>
+  >(
+    map: T
+  ): { [Key in keyof T]: (...args: RestArgs<T[Key]>) => ReturnType<T[Key]> }
+  mapMutations(map: any): { [key: string]: (...args: any[]) => any } {
+    this.ensureStore()
+    const namespace = this.namespace()
+    return namespace === '' ? mapMutations(map) : mapMutations(namespace, map)
+  }
+
+  mapActions<K extends keyof A>(
+    map: K[]
+  ): { [Key in K]: MappedFunction<A[K], Promise<any>> }
+  mapActions<T extends Record<string, keyof A>>(
+    map: T
+  ): { [Key in keyof T]: MappedFunction<A[T[Key]], Promise<any>> }
+  mapActions<
+    T extends Record<string, (dispatch: Dispatch<A>, ...args: any[]) => any>
+  >(
+    map: T
+  ): { [Key in keyof T]: (...args: RestArgs<T[Key]>) => ReturnType<T[Key]> }
+  mapActions(map: any): { [key: string]: (...args: any[]) => any } {
+    this.ensureStore()
+    const namespace = this.namespace()
+    return namespace === '' ? mapActions(map) : mapActions(namespace, map)
+  }
+
   get state(): S {
-    assert(
-      this.path && this.store,
-      'you need to provide the module into the Vuex store before using it.'
-    )
+    this.ensureStore()
     return get(this.path!, this.store!.state)
   }
 
   get getters(): G {
-    assert(
-      this.path && this.store,
-      'you need to provide the module into the Vuex store before using it.'
-    )
+    this.ensureStore()
     return this.namespacedGetters()
   }
 
@@ -166,6 +223,13 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
 
   private namespacedType(type: string): string {
     return this.namespace() + type
+  }
+
+  private ensureStore(): void {
+    assert(
+      this.path && this.store,
+      'you need to provide the module into the Vuex store before using it.'
+    )
   }
 }
 

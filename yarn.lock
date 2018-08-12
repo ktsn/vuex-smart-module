@@ -1291,15 +1291,15 @@ escope@^3.3.0:
     esrecurse "^4.1.0"
     estraverse "^4.1.1"
 
-eslint-config-ktsn-typescript@^1.1.0:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/eslint-config-ktsn-typescript/-/eslint-config-ktsn-typescript-1.1.3.tgz#eacb6133f3a823524c1cfa69bdb39c79770df8f4"
+eslint-config-ktsn-typescript@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/eslint-config-ktsn-typescript/-/eslint-config-ktsn-typescript-1.1.4.tgz#4a405471a94f2ef2da3644e9f0ea9bb387050334"
   dependencies:
-    eslint-config-ktsn "^2.0.0"
+    eslint-config-ktsn "^2.0.1"
     eslint-plugin-typescript "^0.12.0"
-    typescript-eslint-parser "^16.0.1"
+    typescript-eslint-parser "^18.0.0"
 
-eslint-config-ktsn@^2.0.0:
+eslint-config-ktsn@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/eslint-config-ktsn/-/eslint-config-ktsn-2.0.1.tgz#8eac6aba4b534ccb36748656d030f3e2916dd340"
   dependencies:
@@ -1333,7 +1333,7 @@ eslint-visitor-keys@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
 
-eslint@^5.2.0:
+eslint@^5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/eslint/-/eslint-5.3.0.tgz#53695aca5213968aacdf970ccb231e42a2b285f8"
   dependencies:
@@ -3603,7 +3603,7 @@ rollup-pluginutils@^2.0.1:
     estree-walker "^0.5.2"
     micromatch "^2.3.11"
 
-rollup@^0.64.0:
+rollup@^0.64.1:
   version "0.64.1"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.64.1.tgz#9188ee368e5fcd43ffbc00ec414e72eeb5de87ba"
   dependencies:
@@ -4098,7 +4098,7 @@ tar@^4:
     safe-buffer "^5.1.2"
     yallist "^3.0.2"
 
-testem@^2.9.0:
+testem@^2.9.2:
   version "2.9.2"
   resolved "https://registry.yarnpkg.com/testem/-/testem-2.9.2.tgz#d61c638fd7fff6d9bc2f771c673dc10cb1df3d21"
   dependencies:
@@ -4230,16 +4230,16 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript-eslint-parser@^16.0.1:
-  version "16.0.1"
-  resolved "https://registry.yarnpkg.com/typescript-eslint-parser/-/typescript-eslint-parser-16.0.1.tgz#b40681c7043b222b9772748b700a000b241c031b"
+typescript-eslint-parser@^18.0.0:
+  version "18.0.0"
+  resolved "https://registry.yarnpkg.com/typescript-eslint-parser/-/typescript-eslint-parser-18.0.0.tgz#3e5055a44980d69e4154350fc5d8b1ab4e2332a8"
   dependencies:
     lodash.unescape "4.0.1"
     semver "5.5.0"
 
-typescript@^2.9.2:
-  version "2.9.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.9.2.tgz#1cbf61d05d6b96269244eb6a3bce4bd914e0f00c"
+typescript@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.0.1.tgz#43738f29585d3a87575520a4b93ab6026ef11fdb"
 
 uglify-es@^3.3.4:
   version "3.3.9"
@@ -4248,7 +4248,7 @@ uglify-es@^3.3.4:
     commander "~2.13.0"
     source-map "~0.6.1"
 
-uglify-js@^3.4.5:
+uglify-js@^3.4.7:
   version "3.4.7"
   resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.4.7.tgz#4df6b92e54789aa921a254cb1e33704d6ec12b89"
   dependencies:
@@ -4441,7 +4441,7 @@ webpack-sources@^1.0.1, webpack-sources@^1.1.0:
     source-list-map "^2.0.0"
     source-map "~0.6.1"
 
-webpack@^4.16.1:
+webpack@^4.16.5:
   version "4.16.5"
   resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.16.5.tgz#29fb39462823d7eb8aefcab8b45f7f241db0d092"
   dependencies:
