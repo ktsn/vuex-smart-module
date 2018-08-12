@@ -95,6 +95,16 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
     }
   }
 
+  clone(): this {
+    const options = {
+      ...this.options
+    }
+    if (options.modules) {
+      options.modules = mapValues(options.modules, m => m.clone())
+    }
+    return new Module(options) as this
+  }
+
   mapState<K extends keyof S>(map: K[]): { [Key in K]: () => S[Key] }
   mapState<T extends Record<string, keyof S>>(
     map: T
@@ -163,6 +173,16 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
   }
 
   private setStore(store: Store<any>, path: string[]): void {
+    const strModule = (path: string[]): string => path.join('/') || '/'
+
+    assert(
+      this.path === undefined && this.store === undefined,
+      `The module '${strModule(path)}' is already registered on '${strModule(
+        this.path || []
+      )}'.` +
+        ` You should duplicate it by 'clone()' method if you want to use the same module in multiple places.`
+    )
+
     this.path = path
     this.store = store
 

@@ -389,4 +389,92 @@ describe('Module', () => {
       })
     })
   })
+
+  describe('make sure to unique', () => {
+    it('throws when a module is used on multiple places', () => {
+      const foo = new Module({
+        state: FooState
+      })
+
+      const root = new Module({
+        modules: {
+          foo,
+          bar: new Module({
+            modules: {
+              baz: foo
+            }
+          })
+        }
+      })
+
+      assert.throws(() => {
+        new Vuex.Store({
+          ...root.create(),
+          plugins: [root.plugin()]
+        })
+      }, /The module 'bar\/baz' is already registered on 'foo'/)
+    })
+
+    it('can be cloned', () => {
+      const foo = new Module({
+        state: FooState
+      })
+
+      const baz = foo.clone()
+
+      const root = new Module({
+        modules: {
+          foo,
+          bar: new Module({
+            modules: {
+              baz
+            }
+          })
+        }
+      })
+
+      let store!: Vuex.Store<any>
+      assert.doesNotThrow(() => {
+        store = new Vuex.Store({
+          ...root.create(),
+          plugins: [root.plugin()]
+        })
+      })
+
+      assert(store.state.foo.value === 1)
+      assert(store.state.bar.baz.value === 1)
+    })
+
+    it('clones nested modules', () => {
+      const foo = new Module({
+        state: FooState
+      })
+
+      const fooWrapper = new Module({
+        modules: {
+          foo
+        }
+      })
+
+      const bar = fooWrapper.clone()
+
+      const root = new Module({
+        modules: {
+          fooWrapper,
+          bar
+        }
+      })
+
+      let store!: Vuex.Store<any>
+      assert.doesNotThrow(() => {
+        store = new Vuex.Store({
+          ...root.create(),
+          plugins: [root.plugin()]
+        })
+      })
+
+      assert(store.state.fooWrapper.foo.value === 1)
+      assert(store.state.bar.foo.value === 1)
+    })
+  })
 })
