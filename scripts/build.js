@@ -2,6 +2,7 @@
 const fs = require('fs')
 const { rollup } = require('rollup')
 const replace = require('rollup-plugin-replace')
+const nodeResolve = require('rollup-plugin-node-resolve')
 const uglify = require('uglify-js')
 const options = require('./options')
 const pkg = require('../package.json')
@@ -20,9 +21,14 @@ const baseConfig = {
   input: 'lib/index.js',
   output: {
     name: capitalize(pkg.name),
-    banner
+    banner,
+    globals: {
+      vue: 'Vue',
+      vuex: 'Vuex'
+    }
   },
-  plugins: []
+  external: ['vue', 'vuex'],
+  plugins: [nodeResolve()]
 }
 
 function run(options) {

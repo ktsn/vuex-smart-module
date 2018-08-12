@@ -10,7 +10,8 @@
     ],
     "strict": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "importHelpers": true
   },
   "include": [
     "src/**/*.ts",
