@@ -27,11 +27,11 @@ export interface Dispatch<A> {
     type: K,
     payload: Payload<A[K]>,
     options?: DispatchOptions
-  ): void
+  ): Promise<any>
   <K extends keyof A>(
     payload: Payload<A[K]> & { type: K },
     options?: DispatchOptions
-  ): void
+  ): Promise<any>
 }
 
 export interface ModuleOptions<S, G extends BG0, M extends BM0, A extends BA0> {
@@ -102,11 +102,10 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
       this.path && this.store,
       'you need to provide the module into the Vuex store before using it.'
     )
-    return get(this.path!, this.store!.getters)
+    return this.namespacedGetters()
   }
 
-  /* @internal */
-  setStore(store: Store<any>, path: string[]): void {
+  private setStore(store: Store<any>, path: string[]): void {
     this.path = path
     this.store = store
 
@@ -127,9 +126,9 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
     options: any
   ): any {
     if (typeof type === 'string') {
-      dispatch(this.namespacedType(type), payload, options)
+      return dispatch(this.namespacedType(type), payload, options)
     } else {
-      dispatch(
+      return dispatch(
         {
           ...type,
           type: this.namespacedType(type.type)
@@ -139,9 +138,34 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
     }
   }
 
-  private namespacedType(type: string): string {
+  private namespacedGetters(): G {
+    const namespace = this.namespace()
+    const sliceIndex = namespace.length
+    const getters: Record<string, any> = {}
+
+    Object.keys(this.store!.getters).forEach(key => {
+      const sameNamespace = namespace !== key.slice(0, sliceIndex)
+      const name = key.slice(sliceIndex)
+      if (sameNamespace && name) {
+        return
+      }
+
+      Object.defineProperty(getters, name, {
+        get: () => this.store!.getters[key],
+        enumerable: true
+      })
+    })
+
+    return getters as G
+  }
+
+  private namespace(): string {
     const path = this.path!
-    return path.length === 0 ? type : path.join('/') + '/' + type
+    return path.length === 0 ? '' : path.join('/') + '/'
+  }
+
+  private namespacedType(type: string): string {
+    return this.namespace() + type
   }
 }
 

@@ -7,34 +7,34 @@ const localVue = createLocalVue()
 localVue.use(Vuex)
 
 describe('Module', () => {
+  class FooState {
+    value = 1
+  }
+
+  class FooGetters extends Getters<FooState>() {
+    get double(): number {
+      return this.state.value * 2
+    }
+  }
+
+  class FooMutations extends Mutations<FooState>() {
+    inc() {
+      this.state.value++
+    }
+  }
+
+  class FooActions extends Actions<FooState, FooGetters, FooMutations>() {
+    inc() {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          this.commit('inc', undefined)
+          resolve()
+        }, 0)
+      })
+    }
+  }
+
   describe('generate', () => {
-    class FooState {
-      value = 1
-    }
-
-    class FooGetters extends Getters<FooState>() {
-      get double(): number {
-        return this.state.value * 2
-      }
-    }
-
-    class FooMutations extends Mutations<FooState>() {
-      inc() {
-        this.state.value++
-      }
-    }
-
-    class FooActions extends Actions<FooState, FooGetters, FooMutations>() {
-      inc() {
-        return new Promise(resolve => {
-          setTimeout(() => {
-            this.commit('inc', undefined)
-            resolve()
-          }, 0)
-        })
-      }
-    }
-
     it('generates vuex module', () => {
       const m = new Module({
         state: FooState,
@@ -82,6 +82,36 @@ describe('Module', () => {
       assert(store.state.foo.value === 2)
       return store.dispatch('foo/inc').then(() => {
         assert(store.state.foo.value === 3)
+      })
+    })
+  })
+
+  describe('proxy', () => {
+    it('works like a local context object', () => {
+      const foo = new Module({
+        state: FooState,
+        getters: FooGetters,
+        mutations: FooMutations,
+        actions: FooActions
+      })
+
+      const root = new Module({
+        modules: {
+          foo
+        }
+      })
+
+      new Vuex.Store({
+        ...root.create(),
+        plugins: [root.plugin()]
+      })
+
+      assert(foo.state.value === 1)
+      assert(foo.getters.double === 2)
+      foo.commit('inc', undefined)
+      assert(foo.state.value === 2)
+      return foo.dispatch('inc', undefined).then(() => {
+        assert(foo.state.value === 3)
       })
     })
   })
