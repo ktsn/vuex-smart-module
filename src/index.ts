@@ -1,3 +1,2 @@
-export default {
-  // this file is the entry point of the project
-}
+export { Getters, Mutations, Actions } from './assets'
+export { Module } from './module'
