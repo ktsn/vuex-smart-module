@@ -1,6 +1,6 @@
 import {
   Store,
-  Module as VuexModule,
+  StoreOptions,
   Plugin as VuexPlugin,
   GetterTree,
   CommitOptions,
@@ -8,7 +8,7 @@ import {
   MutationTree
 } from 'vuex'
 import { BG0, BM0, BA0, Payload } from './assets'
-import { get, assert, Class } from './utils'
+import { get, assert, Class, mapValues } from './utils'
 
 export interface Commit<M> {
   <K extends keyof M>(
@@ -39,6 +39,7 @@ export interface ModuleOptions<S, G extends BG0, M extends BM0, A extends BA0> {
   getters?: Class<G>
   mutations?: Class<M>
   actions?: Class<A>
+  modules?: Record<string, Module<any, any, any, any>>
 }
 
 export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
@@ -63,15 +64,22 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
 
   constructor(private options: ModuleOptions<S, G, M, A> = {}) {}
 
-  create(): VuexModule<any, any> {
-    const { state, getters, mutations, actions } = this.options
+  create(): StoreOptions<any> {
+    const { state, getters, mutations, actions, modules } = this.options
 
     return {
-      namespaced: true,
       state: state ? new state() : {},
       getters: getters ? initGetters(getters, this) : {},
       mutations: mutations ? initMutations(mutations, this) : {},
-      actions: actions ? initActions(actions, this) : {}
+      actions: actions ? initActions(actions, this) : {},
+      modules: !modules
+        ? undefined
+        : mapValues(modules, m => {
+            return {
+              namespaced: true,
+              ...m.create()
+            }
+          })
     }
   }
 
@@ -101,6 +109,15 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
   setStore(store: Store<any>, path: string[]): void {
     this.path = path
     this.store = store
+
+    const modules = this.options.modules
+    if (modules) {
+      Object.keys(modules).forEach(key => {
+        const m = modules[key]
+        const p = path.concat(key)
+        m.setStore(store, p)
+      })
+    }
   }
 
   private normalizedDispatch(
