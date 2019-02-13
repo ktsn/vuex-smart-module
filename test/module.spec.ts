@@ -2,7 +2,7 @@ import * as assert from 'power-assert'
 import Vue from 'vue'
 import * as Vuex from 'vuex'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
-import { Getters, Mutations, Actions, Module } from '../src'
+import { createStore, Getters, Mutations, Actions, Module } from '../src'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
@@ -44,10 +44,7 @@ describe('Module', () => {
         actions: FooActions
       })
 
-      const store = new Vuex.Store({
-        ...m.create(),
-        plugins: [m.plugin()]
-      })
+      const store = createStore(m)
 
       assert(store.state.value === 1)
       assert(store.getters.double === 2)
@@ -72,10 +69,7 @@ describe('Module', () => {
         }
       })
 
-      const store = new Vuex.Store({
-        ...root.create(),
-        plugins: [root.plugin()]
-      })
+      const store = createStore(root)
 
       assert(store.state.foo.value === 1)
       assert(store.getters['foo/double'] === 2)
@@ -102,43 +96,40 @@ describe('Module', () => {
         }
       })
 
-      new Vuex.Store({
-        ...root.create(),
-        plugins: [root.plugin()]
-      })
+      const store = createStore(root)
 
-      assert(foo.state.value === 1)
-      assert(foo.getters.double === 2)
-      foo.commit('inc', undefined)
-      assert(foo.state.value === 2)
-      return foo.dispatch('inc', undefined).then(() => {
-        assert(foo.state.value === 3)
+      const ctx = foo.context(store)
+
+      assert(ctx.state.value === 1)
+      assert(ctx.getters.double === 2)
+      ctx.commit('inc', undefined)
+      assert(ctx.state.value === 2)
+      return ctx.dispatch('inc', undefined).then(() => {
+        assert(ctx.state.value === 3)
       })
     })
   })
 
   describe('component mappers', () => {
-    let foo: Module<FooState, FooGetters, FooMutations, FooActions>
+    const fooModule = new Module({
+      state: FooState,
+      getters: FooGetters,
+      mutations: FooMutations,
+      actions: FooActions
+    })
+
+    const root = new Module({
+      modules: {
+        foo: fooModule
+      }
+    })
+
+    const foo = fooModule.componentMapper()
+
     let store: Vuex.Store<any>
 
     beforeEach(() => {
-      foo = new Module({
-        state: FooState,
-        getters: FooGetters,
-        mutations: FooMutations,
-        actions: FooActions
-      })
-
-      const root = new Module({
-        modules: {
-          foo
-        }
-      })
-
-      store = new Vuex.Store({
-        ...root.create(),
-        plugins: [root.plugin()]
-      })
+      store = createStore(root)
     })
 
     describe('state', () => {
@@ -317,7 +308,7 @@ describe('Module', () => {
     })
 
     describe('actions', () => {
-      it('maps actionss', () => {
+      it('maps actions', () => {
         const Test = Vue.extend({
           methods: foo.mapActions(['inc']),
 
@@ -359,7 +350,7 @@ describe('Module', () => {
         })
       })
 
-      it('maps mutations with mapper function', () => {
+      it('maps actions with mapper function', () => {
         const Test = Vue.extend({
           methods: foo.mapActions({
             add: (dispatch, payload: number) => {
@@ -387,94 +378,6 @@ describe('Module', () => {
           assert(store.state.foo.value === 4)
         })
       })
-    })
-  })
-
-  describe('make sure to unique', () => {
-    it('throws when a module is used on multiple places', () => {
-      const foo = new Module({
-        state: FooState
-      })
-
-      const root = new Module({
-        modules: {
-          foo,
-          bar: new Module({
-            modules: {
-              baz: foo
-            }
-          })
-        }
-      })
-
-      assert.throws(() => {
-        new Vuex.Store({
-          ...root.create(),
-          plugins: [root.plugin()]
-        })
-      }, /The module 'bar\/baz' is already registered on 'foo'/)
-    })
-
-    it('can be cloned', () => {
-      const foo = new Module({
-        state: FooState
-      })
-
-      const baz = foo.clone()
-
-      const root = new Module({
-        modules: {
-          foo,
-          bar: new Module({
-            modules: {
-              baz
-            }
-          })
-        }
-      })
-
-      let store!: Vuex.Store<any>
-      assert.doesNotThrow(() => {
-        store = new Vuex.Store({
-          ...root.create(),
-          plugins: [root.plugin()]
-        })
-      })
-
-      assert(store.state.foo.value === 1)
-      assert(store.state.bar.baz.value === 1)
-    })
-
-    it('clones nested modules', () => {
-      const foo = new Module({
-        state: FooState
-      })
-
-      const fooWrapper = new Module({
-        modules: {
-          foo
-        }
-      })
-
-      const bar = fooWrapper.clone()
-
-      const root = new Module({
-        modules: {
-          fooWrapper,
-          bar
-        }
-      })
-
-      let store!: Vuex.Store<any>
-      assert.doesNotThrow(() => {
-        store = new Vuex.Store({
-          ...root.create(),
-          plugins: [root.plugin()]
-        })
-      })
-
-      assert(store.state.fooWrapper.foo.value === 1)
-      assert(store.state.bar.foo.value === 1)
     })
   })
 })

@@ -1,38 +1,38 @@
 import { Class } from './utils'
-import { Module, Commit } from './module'
+import { Commit, Context } from './context'
 
 export class BG<S> {
   /* @internal */
-  __module__!: Module<S, BG0, BM0, BA0>
+  __ctx__!: Context<S, BG0, BM0, BA0>
 
   protected get state(): S {
-    return this.__module__.state
+    return this.__ctx__.state
   }
 }
 
 export class BM<S> {
   /* @internal */
-  __module__!: Module<S, BG0, BM0, BA0>
+  __ctx__!: Context<S, BG0, BM0, BA0>
 
   protected get state(): S {
-    return this.__module__.state
+    return this.__ctx__.state
   }
 }
 
 export class BA<S, G extends BG0, M extends BM0> {
   /* @internal */
-  __module__!: Module<S, G, M, BA0>
+  __ctx__!: Context<S, G, M, BA0>
 
   protected get state(): S {
-    return this.__module__.state
+    return this.__ctx__.state
   }
 
   protected get getters(): G {
-    return this.__module__.getters
+    return this.__ctx__.getters
   }
 
   protected get commit(): Commit<M> {
-    return this.__module__.commit
+    return this.__ctx__.commit
   }
 }
 
@@ -44,7 +44,9 @@ export type BA1<S, G extends BG0, M extends BM0> = BA<S, G, M>
 
 export type Payload<T> = T extends () => any
   ? undefined
-  : T extends (payload: infer P) => any ? P : never
+  : T extends (payload: infer P) => any
+  ? P
+  : never
 
 export function Getters<S>(): Class<BG1<S>>
 export function Getters(): Class<BG0> {
