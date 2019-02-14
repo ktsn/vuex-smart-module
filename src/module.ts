@@ -1,10 +1,11 @@
-import { Store, StoreOptions, GetterTree, MutationTree } from 'vuex'
+import { Store, Module as VuexModule, GetterTree, MutationTree } from 'vuex'
 import { BG0, BM0, BA0 } from './assets'
 import { assert, Class, mapValues } from './utils'
 import { Context, ContextPosition } from './context'
 import { ComponentMapper } from './mapper'
 
 export interface ModuleOptions<S, G extends BG0, M extends BM0, A extends BA0> {
+  namespaced?: boolean
   state?: Class<S>
   getters?: Class<G>
   mutations?: Class<M>
@@ -42,7 +43,7 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
     getStore: () => Store<any>, // hacky way to get store object lazily...
     path: string[],
     namespace: string
-  ): StoreOptions<any> {
+  ): VuexModule<any, any> {
     assert(
       !this.path || this.path.join('.') === path.join('.'),
       'You are reusing one module on multiple places in the same store.\n' +
@@ -52,9 +53,17 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
     this.path = path
     this.namespace = namespace
 
-    const { state, getters, mutations, actions, modules } = this.options
+    const {
+      namespaced,
+      state,
+      getters,
+      mutations,
+      actions,
+      modules
+    } = this.options
 
     return {
+      namespaced: namespaced === undefined ? true : namespaced,
       state: state ? new state() : {},
       getters: getters ? initGetters(getters, this, getStore) : {},
       mutations: mutations ? initMutations(mutations, this, getStore) : {},
@@ -62,14 +71,16 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
       modules: !modules
         ? undefined
         : mapValues(modules, (m, key) => {
-            return {
-              namespaced: true,
-              ...m.create(
-                getStore,
-                path.concat(key),
-                (namespace ? namespace + '/' + key : key) + '/'
-              )
-            }
+            const nextNamespaced =
+              m.options.namespaced === undefined ? true : m.options.namespaced
+
+            const nextNamespaceKey = nextNamespaced ? key + '/' : ''
+
+            return m.create(
+              getStore,
+              path.concat(key),
+              namespaced ? namespace + nextNamespaceKey : nextNamespaceKey
+            )
           })
     }
   }

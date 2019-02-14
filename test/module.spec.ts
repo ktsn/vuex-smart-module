@@ -84,6 +84,78 @@ describe('Module', () => {
         assert(store.state.foo.value === 3)
       })
     })
+
+    it('generates no namespaced modules', () => {
+      const foo = new Module({
+        namespaced: false,
+        state: FooState,
+        getters: FooGetters,
+        mutations: FooMutations,
+        actions: FooActions
+      })
+
+      const root = new Module({
+        modules: {
+          foo
+        }
+      })
+
+      const store = createStore(root)
+
+      assert(store.state.foo.value === 1)
+      assert(store.getters.double === 2)
+      store.commit('inc')
+      assert(store.state.foo.value === 2)
+      return store.dispatch('inc').then(() => {
+        assert(store.state.foo.value === 3)
+      })
+    })
+
+    it('handles complex namespace', () => {
+      const baz = new Module({
+        state: FooState,
+        mutations: FooMutations
+      })
+
+      const bar = new Module({
+        namespaced: false,
+        state: FooState,
+        mutations: FooMutations,
+        modules: {
+          baz
+        }
+      })
+
+      const foo = new Module({
+        state: FooState,
+        mutations: FooMutations,
+        modules: {
+          bar
+        }
+      })
+
+      const root = new Module({
+        modules: {
+          foo
+        }
+      })
+
+      const store = createStore(root)
+
+      assert(store.state.foo.value === 1)
+      assert(store.state.foo.bar.value === 1)
+      assert(store.state.foo.bar.baz.value === 1)
+
+      store.commit('foo/inc')
+      assert(store.state.foo.value === 2)
+      assert(store.state.foo.bar.value === 2)
+      assert(store.state.foo.bar.baz.value === 1)
+
+      store.commit('foo/baz/inc')
+      assert(store.state.foo.value === 2)
+      assert(store.state.foo.bar.value === 2)
+      assert(store.state.foo.bar.baz.value === 2)
+    })
   })
 
   describe('getters', () => {
