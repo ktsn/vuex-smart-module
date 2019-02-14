@@ -207,6 +207,21 @@ describe('Module', () => {
 
       assert(store.getters.add(5) === 6)
     })
+
+    it('calls $created hook', done => {
+      class TestGetters extends Getters {
+        $created(store: Vuex.Store<any>): void {
+          assert(store instanceof Vuex.Store)
+          done()
+        }
+      }
+
+      const root = new Module({
+        getters: TestGetters
+      })
+
+      createStore(root)
+    })
   })
 
   describe('mutations', () => {
@@ -287,6 +302,21 @@ describe('Module', () => {
 
       const store = createStore(root)
       store.dispatch('one')
+    })
+
+    it('calls $created hook', done => {
+      class TestActions extends Actions {
+        $created(store: Vuex.Store<any>): void {
+          assert(store instanceof Vuex.Store)
+          done()
+        }
+      }
+
+      const root = new Module({
+        actions: TestActions
+      })
+
+      createStore(root)
     })
   })
 

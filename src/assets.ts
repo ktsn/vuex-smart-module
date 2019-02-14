@@ -1,9 +1,12 @@
+import { Store } from 'vuex'
 import { Commit, Dispatch, Context } from './context'
 import { Module } from './module'
 
 export class Getters<S = {}> {
   /* @internal */
   __ctx__!: Context<Module<S, this, BM0, BA0>>
+
+  $created(_store: Store<any>): void {}
 
   protected get state(): S {
     return this.__ctx__.state
@@ -31,6 +34,8 @@ export class Actions<
 > {
   /* @internal */
   __ctx__!: Context<Module<S, G, M, any>>
+
+  $created(_store: Store<any>): void {}
 
   protected get state(): S {
     return this.__ctx__.state

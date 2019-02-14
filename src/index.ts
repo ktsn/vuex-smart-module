@@ -8,9 +8,17 @@ export function createStore(
   rootModule: Module<any, any, any, any>,
   options: StoreOptions<any> = {}
 ): Store<any> {
+  const { options: rootModuleOptions, injectStore } = rootModule.create([], '')
+
+  const plugin = (store: Store<any>) => {
+    injectStore(store)
+  }
+
   const store: Store<any> = new Store({
     ...options,
-    ...rootModule.create(() => store, [], '')
+    ...rootModuleOptions,
+    plugins: [plugin].concat(options.plugins || [])
   })
+
   return store
 }

@@ -1,6 +1,12 @@
-import { Store, Module as VuexModule, GetterTree, MutationTree } from 'vuex'
+import {
+  Store,
+  Module as VuexModule,
+  GetterTree,
+  MutationTree,
+  ActionTree
+} from 'vuex'
 import { BG0, BM0, BA0 } from './assets'
-import { assert, Class, mapValues } from './utils'
+import { assert, Class, mapValues, noop, combine } from './utils'
 import { Context, ContextPosition } from './context'
 import { ComponentMapper } from './mapper'
 
@@ -11,6 +17,11 @@ export interface ModuleOptions<S, G extends BG0, M extends BM0, A extends BA0> {
   mutations?: Class<M>
   actions?: Class<A>
   modules?: Record<string, Module<any, any, any, any>>
+}
+
+interface ModuleInstance {
+  options: VuexModule<any, any>
+  injectStore: (store: Store<any>) => void
 }
 
 export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
@@ -39,11 +50,7 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
   }
 
   /* @internal */
-  create(
-    getStore: () => Store<any>, // hacky way to get store object lazily...
-    path: string[],
-    namespace: string
-  ): VuexModule<any, any> {
+  create(path: string[], namespace: string): ModuleInstance {
     assert(
       !this.path || this.path.join('.') === path.join('.'),
       'You are reusing one module on multiple places in the same store.\n' +
@@ -62,26 +69,51 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
       modules
     } = this.options
 
-    return {
-      namespaced: namespaced === undefined ? true : namespaced,
-      state: state ? new state() : {},
-      getters: getters ? initGetters(getters, this, getStore) : {},
-      mutations: mutations ? initMutations(mutations, this, getStore) : {},
-      actions: actions ? initActions(actions, this, getStore) : {},
-      modules: !modules
-        ? undefined
-        : mapValues(modules, (m, key) => {
+    const children = !modules
+      ? undefined
+      : Object.keys(modules).reduce(
+          (acc, key) => {
+            const m = modules[key]
             const nextNamespaced =
               m.options.namespaced === undefined ? true : m.options.namespaced
 
             const nextNamespaceKey = nextNamespaced ? key + '/' : ''
 
-            return m.create(
-              getStore,
+            const res = m.create(
               path.concat(key),
               namespaced ? namespace + nextNamespaceKey : nextNamespaceKey
             )
-          })
+
+            acc.options[key] = res.options
+            acc.injectStore = combine(acc.injectStore, res.injectStore)
+
+            return acc
+          },
+          {
+            options: {} as Record<string, VuexModule<any, any>>,
+            injectStore: noop as (store: Store<any>) => void
+          }
+        )
+
+    const gettersInstance = getters && initGetters(getters, this)
+    const mutationsInstance = mutations && initMutations(mutations, this)
+    const actionsInstance = actions && initActions(actions, this)
+
+    return {
+      options: {
+        namespaced: namespaced === undefined ? true : namespaced,
+        state: state ? new state() : {},
+        getters: gettersInstance && gettersInstance.getters,
+        mutations: mutationsInstance && mutationsInstance.mutations,
+        actions: actionsInstance && actionsInstance.actions,
+        modules: children && children.options
+      },
+      injectStore: combine(
+        children ? children.injectStore : noop,
+        gettersInstance ? gettersInstance.injectStore : noop,
+        mutationsInstance ? mutationsInstance.injectStore : noop,
+        actionsInstance ? actionsInstance.injectStore : noop
+      )
     }
   }
 }
@@ -107,14 +139,9 @@ function createLazyContextPosition(
 
 function initGetters<S, G extends BG0, M extends BM0, A extends BA0>(
   Getters: Class<G>,
-  module: Module<S, G, M, A>,
-  getStore: () => Store<any>
-): GetterTree<any, any> {
-  const getters: any = new Getters()
-  Object.defineProperty(getters, '__ctx__', {
-    get: () => module.context(getStore())
-  })
-
+  module: Module<S, G, M, A>
+): { getters: GetterTree<any, any>; injectStore: (store: Store<any>) => void } {
+  const getters = new Getters()
   const options: GetterTree<any, any> = {}
 
   Object.getOwnPropertyNames(Getters.prototype).forEach(key => {
@@ -126,24 +153,30 @@ function initGetters<S, G extends BG0, M extends BM0, A extends BA0>(
     }
 
     options[key] = () => {
-      const res = getters[key]
+      const res = (getters as any)[key]
       return typeof res === 'function' ? res.bind(getters) : res
     }
   })
 
-  return options
+  return {
+    getters: options,
+    injectStore: store => {
+      const context = module.context(store)
+
+      Object.defineProperty(getters, '__ctx__', {
+        get: () => context
+      })
+
+      getters.$created(store)
+    }
+  }
 }
 
 function initMutations<S, G extends BG0, M extends BM0, A extends BA0>(
   Mutations: Class<M>,
-  module: Module<S, G, M, A>,
-  getStore: () => Store<any>
-): MutationTree<any> {
-  const mutations: any = new Mutations()
-  Object.defineProperty(mutations, '__ctx__', {
-    get: () => module.context(getStore())
-  })
-
+  module: Module<S, G, M, A>
+): { mutations: MutationTree<any>; injectStore: (store: Store<any>) => void } {
+  const mutations = new Mutations()
   const options: MutationTree<any> = {}
 
   Object.getOwnPropertyNames(Mutations.prototype).forEach(key => {
@@ -154,23 +187,26 @@ function initMutations<S, G extends BG0, M extends BM0, A extends BA0>(
       return
     }
 
-    options[key] = (_: any, payload: any) => mutations[key](payload)
+    options[key] = (_: any, payload: any) => (mutations as any)[key](payload)
   })
 
-  return options
+  return {
+    mutations: options,
+    injectStore: store => {
+      const context = module.context(store)
+      Object.defineProperty(mutations, '__ctx__', {
+        get: () => context
+      })
+    }
+  }
 }
 
 function initActions<S, G extends BG0, M extends BM0, A extends BA0>(
   Actions: Class<A>,
-  module: Module<S, G, M, A>,
-  getStore: () => Store<any>
-): MutationTree<any> {
-  const actions: any = new Actions()
-  Object.defineProperty(actions, '__ctx__', {
-    get: () => module.context(getStore())
-  })
-
-  const options: MutationTree<any> = {}
+  module: Module<S, G, M, A>
+): { actions: ActionTree<any, any>; injectStore: (store: Store<any>) => void } {
+  const actions = new Actions()
+  const options: ActionTree<any, any> = {}
 
   Object.getOwnPropertyNames(Actions.prototype).forEach(key => {
     if (key === 'constructor') return
@@ -180,8 +216,19 @@ function initActions<S, G extends BG0, M extends BM0, A extends BA0>(
       return
     }
 
-    options[key] = (_: any, payload: any) => actions[key](payload)
+    options[key] = (_: any, payload: any) => (actions as any)[key](payload)
   })
 
-  return options
+  return {
+    actions: options,
+    injectStore: store => {
+      const context = module.context(store)
+
+      Object.defineProperty(actions, '__ctx__', {
+        get: () => context
+      })
+
+      actions.$created(store)
+    }
+  }
 }

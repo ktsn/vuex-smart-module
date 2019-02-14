@@ -2,6 +2,14 @@ export interface Class<T> {
   new (...args: any[]): T
 }
 
+export const noop = () => {}
+
+export function combine<T>(...fs: ((x: T) => void)[]): (x: T) => void {
+  return x => {
+    fs.forEach(f => f(x))
+  }
+}
+
 export function get<T = any>(path: string[], value: any): T {
   return path.reduce((acc, key) => {
     return acc[key]
