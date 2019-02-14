@@ -89,8 +89,8 @@ function write(config, bundle, prod) {
   }
 }
 
-function minify({ code }) {
-  return uglify.minify(code, {
+function minify(chunks) {
+  return uglify.minify(chunks.output[0].code, {
     compress: {
       toplevel: true
     },
