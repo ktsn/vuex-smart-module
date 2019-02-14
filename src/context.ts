@@ -129,6 +129,7 @@ export function getters(store: Store<any>, namespace: string): any {
 }
 
 export class Context<Mod extends Module<any, any, any, any>> {
+  /** @internal */
   constructor(private pos: ContextPosition, private store: Store<any>) {}
 
   commit: Commit<Mutations<Mod>> = (

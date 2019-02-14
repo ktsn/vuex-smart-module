@@ -2,6 +2,7 @@ import { Store, StoreOptions } from 'vuex'
 import { Module } from './module'
 
 export { Getters, Mutations, Actions } from './assets'
+export { Context } from './context'
 export { Module }
 
 export function createStore(

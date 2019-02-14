@@ -2,7 +2,14 @@ import * as assert from 'power-assert'
 import Vue from 'vue'
 import * as Vuex from 'vuex'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
-import { createStore, Getters, Mutations, Actions, Module } from '../src'
+import {
+  createStore,
+  Getters,
+  Mutations,
+  Actions,
+  Module,
+  Context
+} from '../src'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
@@ -320,7 +327,7 @@ describe('Module', () => {
     })
   })
 
-  describe('proxy', () => {
+  describe('context', () => {
     it('works like a local context object', () => {
       const foo = new Module({
         state: FooState,
@@ -347,6 +354,80 @@ describe('Module', () => {
         assert(ctx.state.value === 3)
       })
     })
+
+    it("can be used in other module's getter", () => {
+      const foo = new Module({
+        state: FooState,
+        getters: FooGetters,
+        mutations: FooMutations,
+        actions: FooActions
+      })
+
+      class TestGetters extends Getters {
+        foo!: Context<typeof foo>
+
+        $created(store: Vuex.Store<any>): void {
+          this.foo = foo.context(store)
+        }
+
+        get triple(): number {
+          return this.foo.state.value + this.foo.getters.double
+        }
+      }
+
+      const test = new Module({
+        getters: TestGetters
+      })
+
+      const root = new Module({
+        modules: {
+          test,
+          foo
+        }
+      })
+
+      const store = createStore(root)
+
+      assert(store.getters['test/triple'] === 3)
+    })
+  })
+
+  it("can be used in other module's action", () => {
+    const foo = new Module({
+      state: FooState,
+      getters: FooGetters,
+      mutations: FooMutations,
+      actions: FooActions
+    })
+
+    class TestActions extends Actions {
+      foo!: Context<typeof foo>
+
+      $created(store: Vuex.Store<any>): void {
+        this.foo = foo.context(store)
+      }
+
+      incByTwo(): void {
+        this.foo.commit('inc', undefined)
+        this.foo.commit('inc', undefined)
+      }
+    }
+
+    const test = new Module({
+      actions: TestActions
+    })
+
+    const root = new Module({
+      modules: {
+        test,
+        foo
+      }
+    })
+
+    const store = createStore(root)
+
+    store.dispatch('test/incByTwo')
+    assert(store.state.foo.value === 3)
   })
 
   describe('component mappers', () => {
