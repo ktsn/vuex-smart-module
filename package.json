@@ -2,16 +2,18 @@
   "name": "vuex-smart-module",
   "version": "0.1.0",
   "author": "katashin",
-  "description": "Smart Vuex module",
+  "description": "Type safe Vuex module with powerful module features",
   "keywords": [
     "Vue.js",
     "Vuex",
     "module",
-    "helper"
+    "helper",
+    "type safety",
+    "typescript"
   ],
   "license": "MIT",
   "main": "dist/vuex-smart-module.cjs.js",
-  "module": "lib/index.js",
+  "module": "dist/vuex-smart-module.esm.js",
   "types": "lib/index.d.ts",
   "files": [
     "dist",
