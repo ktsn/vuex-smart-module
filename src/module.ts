@@ -78,20 +78,17 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
 function createLazyContextPosition(
   module: Module<any, any, any, any>
 ): ContextPosition {
+  const message =
+    'The module need to be registered a store before using `context` or `componentMapper`'
+
   return {
     get path() {
-      assert(
-        module.path !== undefined,
-        'The module need to be registered a store before using `context` or `componentMapper`'
-      )
+      assert(module.path !== undefined, message)
       return module.path!
     },
 
     get namespace() {
-      assert(
-        module.namespace !== undefined,
-        'The module need to be registered a store before using `context` or `componentMapper`'
-      )
+      assert(module.namespace !== undefined, message)
       return module.namespace!
     }
   }
