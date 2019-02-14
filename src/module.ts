@@ -4,44 +4,32 @@ import { assert, Class, mapValues } from './utils'
 import { Context, ContextPosition } from './context'
 import { ComponentMapper } from './mapper'
 
-export interface ModuleOptions<
-  S,
-  G extends BG0,
-  M extends BM0,
-  A extends BA0,
-  Mod extends Record<string, Module<any, any, any, any, any>>
-> {
+export interface ModuleOptions<S, G extends BG0, M extends BM0, A extends BA0> {
   state?: Class<S>
   getters?: Class<G>
   mutations?: Class<M>
   actions?: Class<A>
-  modules?: Mod
+  modules?: Record<string, Module<any, any, any, any>>
 }
 
-export class Module<
-  S,
-  G extends BG0,
-  M extends BM0,
-  A extends BA0,
-  Mod extends Record<string, Module<any, any, any, any, any>>
-> {
+export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
   /* @internal */
   path: string[] | undefined
 
   /* @internal */
   namespace: string | undefined
 
-  constructor(private options: ModuleOptions<S, G, M, A, Mod> = {}) {}
+  constructor(private options: ModuleOptions<S, G, M, A> = {}) {}
 
-  clone(): Module<S, G, M, A, Mod> {
+  clone(): Module<S, G, M, A> {
     const options = { ...this.options }
     if (options.modules) {
-      options.modules = mapValues(options.modules, m => m.clone()) as Mod
+      options.modules = mapValues(options.modules, m => m.clone())
     }
     return new Module(options)
   }
 
-  context(store: Store<any>): Context<S, G, M, A> {
+  context(store: Store<any>): Context<this> {
     return new Context(createLazyContextPosition(this), store)
   }
 
@@ -88,7 +76,7 @@ export class Module<
 }
 
 function createLazyContextPosition(
-  module: Module<any, any, any, any, any>
+  module: Module<any, any, any, any>
 ): ContextPosition {
   return {
     get path() {
@@ -109,15 +97,9 @@ function createLazyContextPosition(
   }
 }
 
-function initGetters<
-  S,
-  G extends BG0,
-  M extends BM0,
-  A extends BA0,
-  Mod extends Record<string, Module<any, any, any, any, any>>
->(
+function initGetters<S, G extends BG0, M extends BM0, A extends BA0>(
   Getters: Class<G>,
-  module: Module<S, G, M, A, Mod>,
+  module: Module<S, G, M, A>,
   getStore: () => Store<any>
 ): GetterTree<any, any> {
   const getters: any = new Getters()
@@ -135,21 +117,18 @@ function initGetters<
       return
     }
 
-    options[key] = () => getters[key]
+    options[key] = () => {
+      const res = getters[key]
+      return typeof res === 'function' ? res.bind(getters) : res
+    }
   })
 
   return options
 }
 
-function initMutations<
-  S,
-  G extends BG0,
-  M extends BM0,
-  A extends BA0,
-  Mod extends Record<string, Module<any, any, any, any, any>>
->(
+function initMutations<S, G extends BG0, M extends BM0, A extends BA0>(
   Mutations: Class<M>,
-  module: Module<S, G, M, A, Mod>,
+  module: Module<S, G, M, A>,
   getStore: () => Store<any>
 ): MutationTree<any> {
   const mutations: any = new Mutations()
@@ -173,15 +152,9 @@ function initMutations<
   return options
 }
 
-function initActions<
-  S,
-  G extends BG0,
-  M extends BM0,
-  A extends BA0,
-  Mod extends Record<string, Module<any, any, any, any, any>>
->(
+function initActions<S, G extends BG0, M extends BM0, A extends BA0>(
   Actions: Class<A>,
-  module: Module<S, G, M, A, Mod>,
+  module: Module<S, G, M, A>,
   getStore: () => Store<any>
 ): MutationTree<any> {
   const actions: any = new Actions()

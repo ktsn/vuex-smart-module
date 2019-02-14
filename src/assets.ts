@@ -1,27 +1,36 @@
-import { Class } from './utils'
-import { Commit, Context } from './context'
+import { Commit, Dispatch, Context } from './context'
+import { Module } from './module'
 
-export class BG<S> {
+export class Getters<S = {}> {
   /* @internal */
-  __ctx__!: Context<S, BG0, BM0, BA0>
+  __ctx__!: Context<Module<S, this, BM0, BA0>>
+
+  protected get state(): S {
+    return this.__ctx__.state
+  }
+
+  protected get getters(): this {
+    return this.__ctx__.getters
+  }
+}
+
+export class Mutations<S = {}> {
+  /* @internal */
+  __ctx__!: Context<Module<S, BG0, BM0, BA0>>
 
   protected get state(): S {
     return this.__ctx__.state
   }
 }
 
-export class BM<S> {
+export class Actions<
+  S = {},
+  G extends BG0 = Getters,
+  M extends BM0 = Mutations,
+  A = {} // We need to specify self action type explicitly to infer dispatch type.
+> {
   /* @internal */
-  __ctx__!: Context<S, BG0, BM0, BA0>
-
-  protected get state(): S {
-    return this.__ctx__.state
-  }
-}
-
-export class BA<S, G extends BG0, M extends BM0> {
-  /* @internal */
-  __ctx__!: Context<S, G, M, BA0>
+  __ctx__!: Context<Module<S, G, M, any>>
 
   protected get state(): S {
     return this.__ctx__.state
@@ -34,36 +43,21 @@ export class BA<S, G extends BG0, M extends BM0> {
   protected get commit(): Commit<M> {
     return this.__ctx__.commit
   }
+
+  protected get dispatch(): Dispatch<A> {
+    return this.__ctx__.dispatch
+  }
 }
 
-export type BG0 = BG<{}>
-export type BG1<S> = BG<S>
-export type BM0 = BM<{}>
-export type BA0 = BA<{}, BG0, BM0>
-export type BA1<S, G extends BG0, M extends BM0> = BA<S, G, M>
+// Type aliases for internal use
+export type BG0 = Getters
+export type BG1<S> = Getters<S>
+export type BM0 = Mutations
+export type BA0 = Actions
+export type BA1<S, G extends BG0, M extends BM0> = Actions<S, G, M>
 
 export type Payload<T> = T extends () => any
   ? undefined
   : T extends (payload: infer P) => any
   ? P
   : never
-
-export function Getters<S>(): Class<BG1<S>>
-export function Getters(): Class<BG0> {
-  return BG
-}
-
-export function Mutations<S>(): Class<BM<S>>
-export function Mutations(): Class<BM0> {
-  return BM
-}
-
-export function Actions<G extends BG0>(): Class<BA1<{}, G, BM0>>
-export function Actions<M extends BM0>(): Class<BA1<{}, BG0, M>>
-export function Actions<S>(): Class<BA1<S, BG0, BM0>>
-export function Actions<S, G extends BG0>(): Class<BA1<S, G, BM<S>>>
-export function Actions<S, M extends BM0>(): Class<BA1<S, BG1<S>, M>>
-export function Actions<S, G extends BG0, M extends BM0>(): Class<BA1<S, G, M>>
-export function Actions(): Class<BA0> {
-  return BA
-}

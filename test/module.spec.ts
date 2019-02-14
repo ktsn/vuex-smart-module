@@ -12,19 +12,24 @@ describe('Module', () => {
     value = 1
   }
 
-  class FooGetters extends Getters<FooState>() {
+  class FooGetters extends Getters<FooState> {
     get double(): number {
       return this.state.value * 2
     }
   }
 
-  class FooMutations extends Mutations<FooState>() {
+  class FooMutations extends Mutations<FooState> {
     inc() {
       this.state.value++
     }
   }
 
-  class FooActions extends Actions<FooState, FooGetters, FooMutations>() {
+  class FooActions extends Actions<
+    FooState,
+    FooGetters,
+    FooMutations,
+    FooActions
+  > {
     inc() {
       return new Promise(resolve => {
         setTimeout(() => {
@@ -78,6 +83,138 @@ describe('Module', () => {
       return store.dispatch('foo/inc').then(() => {
         assert(store.state.foo.value === 3)
       })
+    })
+  })
+
+  describe('getters', () => {
+    it('has state reference', () => {
+      const root = new Module({
+        state: FooState,
+        getters: FooGetters
+      })
+
+      const store = createStore(root)
+
+      assert(store.getters.double === 2)
+    })
+
+    it('has state and getters reference', () => {
+      class TestGetters extends Getters<FooState> {
+        get five(): number {
+          return 5
+        }
+
+        get ten(): number {
+          return this.getters.five * 2
+        }
+      }
+
+      const root = new Module({
+        state: FooState,
+        getters: TestGetters
+      })
+
+      const store = createStore(root)
+
+      assert(store.getters.ten === 10)
+    })
+
+    it('can has method style getters', () => {
+      class TestGetters extends Getters<FooState> {
+        add(n: number): number {
+          return this.state.value + n
+        }
+      }
+
+      const root = new Module({
+        state: FooState,
+        getters: TestGetters
+      })
+
+      const store = createStore(root)
+
+      assert(store.getters.add(5) === 6)
+    })
+  })
+
+  describe('mutations', () => {
+    it('has state reference', () => {
+      const root = new Module({
+        state: FooState,
+        mutations: FooMutations
+      })
+
+      const store = createStore(root)
+      store.commit('inc')
+      assert(store.state.value === 2)
+    })
+  })
+
+  describe('actions', () => {
+    it('has state reference', done => {
+      class TestActions extends Actions<FooState> {
+        test(): void {
+          assert(this.state.value === 1)
+          done()
+        }
+      }
+
+      const root = new Module({
+        state: FooState,
+        actions: TestActions
+      })
+
+      const store = createStore(root)
+      store.dispatch('test')
+    })
+
+    it('has getters reference', done => {
+      class TestActions extends Actions<FooState, FooGetters> {
+        test(): void {
+          assert(this.getters.double === 2)
+          done()
+        }
+      }
+
+      const root = new Module({
+        state: FooState,
+        getters: FooGetters,
+        actions: TestActions
+      })
+
+      const store = createStore(root)
+      store.dispatch('test')
+    })
+
+    it('has commit reference', async () => {
+      const root = new Module({
+        state: FooState,
+        mutations: FooMutations,
+        actions: FooActions
+      })
+
+      const store = createStore(root)
+      await store.dispatch('inc')
+      assert(store.state.value === 2)
+    })
+
+    it('has dispatch reference', done => {
+      class TestActions extends Actions<{}, Getters, Mutations, TestActions> {
+        one(): void {
+          this.dispatch('two', undefined)
+        }
+
+        two(): void {
+          done()
+        }
+      }
+
+      const root = new Module({
+        actions: TestActions
+      })
+
+      const store = createStore(root)
+      store.dispatch('one')
     })
   })
 

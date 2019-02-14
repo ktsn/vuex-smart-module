@@ -1,6 +1,7 @@
 import { Store, CommitOptions, DispatchOptions } from 'vuex'
-import { BG0, BM0, BA0, Payload } from './assets'
+import { Payload } from './assets'
 import { get } from './utils'
+import { Module } from './module'
 
 export interface Commit<M> {
   <K extends keyof M>(
@@ -25,6 +26,42 @@ export interface Dispatch<A> {
     options?: DispatchOptions
   ): Promise<any>
 }
+
+type State<Mod extends Module<any, any, any, any>> = Mod extends Module<
+  infer R,
+  any,
+  any,
+  any
+>
+  ? R
+  : never
+
+type Getters<Mod extends Module<any, any, any, any>> = Mod extends Module<
+  any,
+  infer R,
+  any,
+  any
+>
+  ? R
+  : never
+
+type Mutations<Mod extends Module<any, any, any, any>> = Mod extends Module<
+  any,
+  any,
+  infer R,
+  any
+>
+  ? R
+  : never
+
+type Actions<Mod extends Module<any, any, any, any>> = Mod extends Module<
+  any,
+  any,
+  any,
+  infer R
+>
+  ? R
+  : never
 
 export interface ContextPosition {
   path: string[]
@@ -91,22 +128,30 @@ export function getters(store: Store<any>, namespace: string): any {
   return getters
 }
 
-export class Context<S, G extends BG0, M extends BM0, A extends BA0> {
+export class Context<Mod extends Module<any, any, any, any>> {
   constructor(private pos: ContextPosition, private store: Store<any>) {}
 
-  commit: Commit<M> = (type: any, payload: any, options?: any): void => {
+  commit: Commit<Mutations<Mod>> = (
+    type: any,
+    payload: any,
+    options?: any
+  ): void => {
     return commit(this.store, this.pos.namespace, type, payload, options)
   }
 
-  dispatch: Dispatch<A> = (type: any, payload: any, options?: any): any => {
+  dispatch: Dispatch<Actions<Mod>> = (
+    type: any,
+    payload: any,
+    options?: any
+  ): any => {
     return dispatch(this.store, this.pos.namespace, type, payload, options)
   }
 
-  get state(): S {
+  get state(): State<Mod> {
     return get(this.pos.path, this.store.state)
   }
 
-  get getters(): G {
+  get getters(): Getters<Mod> {
     return getters(this.store, this.pos.namespace)
   }
 }

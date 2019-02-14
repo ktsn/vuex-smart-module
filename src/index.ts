@@ -5,7 +5,7 @@ export { Getters, Mutations, Actions } from './assets'
 export { Module }
 
 export function createStore(
-  rootModule: Module<any, any, any, any, any>,
+  rootModule: Module<any, any, any, any>,
   options: StoreOptions<any> = {}
 ): Store<any> {
   const store: Store<any> = new Store({
