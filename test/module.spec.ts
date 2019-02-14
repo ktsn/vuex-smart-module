@@ -215,9 +215,9 @@ describe('Module', () => {
       assert(store.getters.add(5) === 6)
     })
 
-    it('calls $created hook', done => {
+    it('calls $init hook', done => {
       class TestGetters extends Getters {
-        $created(store: Vuex.Store<any>): void {
+        $init(store: Vuex.Store<any>): void {
           assert(store instanceof Vuex.Store)
           done()
         }
@@ -311,9 +311,9 @@ describe('Module', () => {
       store.dispatch('one')
     })
 
-    it('calls $created hook', done => {
+    it('calls $init hook', done => {
       class TestActions extends Actions {
-        $created(store: Vuex.Store<any>): void {
+        $init(store: Vuex.Store<any>): void {
           assert(store instanceof Vuex.Store)
           done()
         }
@@ -366,7 +366,7 @@ describe('Module', () => {
       class TestGetters extends Getters {
         foo!: Context<typeof foo>
 
-        $created(store: Vuex.Store<any>): void {
+        $init(store: Vuex.Store<any>): void {
           this.foo = foo.context(store)
         }
 
@@ -403,7 +403,7 @@ describe('Module', () => {
     class TestActions extends Actions {
       foo!: Context<typeof foo>
 
-      $created(store: Vuex.Store<any>): void {
+      $init(store: Vuex.Store<any>): void {
         this.foo = foo.context(store)
       }
 

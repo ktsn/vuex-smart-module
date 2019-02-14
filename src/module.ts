@@ -167,7 +167,7 @@ function initGetters<S, G extends BG0, M extends BM0, A extends BA0>(
         get: () => context
       })
 
-      getters.$created(store)
+      getters.$init(store)
     }
   }
 }
@@ -228,7 +228,7 @@ function initActions<S, G extends BG0, M extends BM0, A extends BA0>(
         get: () => context
       })
 
-      actions.$created(store)
+      actions.$init(store)
     }
   }
 }
