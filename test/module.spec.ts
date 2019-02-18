@@ -431,7 +431,7 @@ describe('Module', () => {
   })
 
   describe('component mappers', () => {
-    const fooModule = new Module({
+    const foo = new Module({
       state: FooState,
       getters: FooGetters,
       mutations: FooMutations,
@@ -440,11 +440,9 @@ describe('Module', () => {
 
     const root = new Module({
       modules: {
-        foo: fooModule
+        foo
       }
     })
-
-    const foo = fooModule.componentMapper()
 
     let store: Vuex.Store<any>
 

@@ -5,10 +5,18 @@ import {
   MutationTree,
   ActionTree
 } from 'vuex'
-import { BG0, BM0, BA0 } from './assets'
+import { BG0, BM0, BA0, Payload } from './assets'
 import { assert, Class, mapValues, noop, combine } from './utils'
-import { Context, ContextPosition } from './context'
+import { Context, ContextPosition, Commit, Dispatch } from './context'
 import { ComponentMapper } from './mapper'
+
+export type MappedFunction<Fn, R> = Payload<Fn> extends undefined
+  ? (payload?: Payload<Fn>) => R
+  : (payload: Payload<Fn>) => R
+
+export type RestArgs<Fn> = Fn extends (_: any, ...args: infer R) => any
+  ? R
+  : never
 
 export interface ModuleOptions<S, G extends BG0, M extends BM0, A extends BA0> {
   namespaced?: boolean
@@ -31,6 +39,10 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
   /* @internal */
   namespace: string | undefined
 
+  private mapper: ComponentMapper = new ComponentMapper(
+    createLazyContextPosition(this)
+  )
+
   constructor(private options: ModuleOptions<S, G, M, A> = {}) {}
 
   clone(): Module<S, G, M, A> {
@@ -45,8 +57,53 @@ export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
     return new Context(createLazyContextPosition(this), store)
   }
 
-  componentMapper(): ComponentMapper<S, G, M, A> {
-    return new ComponentMapper(createLazyContextPosition(this))
+  mapState<K extends keyof S>(map: K[]): { [Key in K]: () => S[Key] }
+  mapState<T extends Record<string, keyof S>>(
+    map: T
+  ): { [Key in keyof T]: () => S[T[Key] & keyof S] }
+  mapState<T extends Record<string, (state: S, getters: G) => any>>(
+    map: T
+  ): { [Key in keyof T]: () => ReturnType<T[Key]> }
+  mapState(map: any): { [key: string]: () => any } {
+    return this.mapper.mapState(map)
+  }
+
+  mapGetters<K extends keyof G>(map: K[]): { [Key in K]: () => G[Key] }
+  mapGetters<T extends Record<string, keyof G>>(
+    map: T
+  ): { [Key in keyof T]: () => G[T[Key] & keyof G] }
+  mapGetters(map: any): { [key: string]: () => any } {
+    return this.mapper.mapGetters(map)
+  }
+
+  mapMutations<K extends keyof M>(
+    map: K[]
+  ): { [Key in K]: MappedFunction<M[K], void> }
+  mapMutations<T extends Record<string, keyof M>>(
+    map: T
+  ): { [Key in keyof T]: MappedFunction<M[T[Key] & keyof M], void> }
+  mapMutations<
+    T extends Record<string, (commit: Commit<M>, ...args: any[]) => any>
+  >(
+    map: T
+  ): { [Key in keyof T]: (...args: RestArgs<T[Key]>) => ReturnType<T[Key]> }
+  mapMutations(map: any): { [key: string]: (...args: any[]) => any } {
+    return this.mapper.mapMutations(map)
+  }
+
+  mapActions<K extends keyof A>(
+    map: K[]
+  ): { [Key in K]: MappedFunction<A[K], Promise<any>> }
+  mapActions<T extends Record<string, keyof A>>(
+    map: T
+  ): { [Key in keyof T]: MappedFunction<A[T[Key] & keyof A], Promise<any>> }
+  mapActions<
+    T extends Record<string, (dispatch: Dispatch<A>, ...args: any[]) => any>
+  >(
+    map: T
+  ): { [Key in keyof T]: (...args: RestArgs<T[Key]>) => ReturnType<T[Key]> }
+  mapActions(map: any): { [key: string]: (...args: any[]) => any } {
+    return this.mapper.mapActions(map)
   }
 
   /* @internal */

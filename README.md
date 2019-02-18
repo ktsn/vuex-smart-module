@@ -284,7 +284,7 @@ const store = createStore(root)
 
 ### Component Mapper
 
-You can create component mapper by calling `componentMapper()` method of a module. The returned object has `mapXXX` helpers as same as Vuex ones. The mapped computed properties and methods are strictly typed. So you will not have some typo or pass wrong payload for them.
+Modules have `mapXXX` helpers as methods which are the same interface as Vuex ones. The mapped computed properties and methods are strictly typed. So you will not have some typo or pass wrong payload for them.
 
 ```ts
 import Vue from 'vuex'
@@ -292,13 +292,10 @@ import Vue from 'vuex'
 // Import foo module
 import { foo } from '@/store/modules/foo'
 
-// Create component mapper
-const { mapGetters, mapActions } = foo.componentMapper()
-
 export default Vue.extend({
-  computed: mapGetters(['double']),
+  computed: foo.mapGetters(['double']),
 
-  methods: mapActions({
+  methods: foo.mapActions({
     incAsync: 'incrementAsync'
   }),
 
