@@ -69,7 +69,7 @@ class FooActions extends Actions<
     // Actions instance has 'state', 'getters', 'commit' and 'dispatch' properties
 
     return new Promise(resolve => {
-      setTimout(() => {
+      setTimeout(() => {
         this.commit('inc', payload.amount)
       }, payload.interval)
     })
