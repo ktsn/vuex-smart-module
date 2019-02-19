@@ -5,12 +5,12 @@ import {
   MutationTree,
   ActionTree
 } from 'vuex'
-import { BG0, BM0, BA0, Payload } from './assets'
+import { Payload, BA, BG, BM } from './assets'
 import { assert, Class, mapValues, noop, combine } from './utils'
 import { Context, ContextPosition, Commit, Dispatch } from './context'
 import { ComponentMapper } from './mapper'
 
-export type MappedFunction<Fn, R> = Payload<Fn> extends undefined
+export type MappedFunction<Fn, R> = undefined extends Payload<Fn>
   ? (payload?: Payload<Fn>) => R
   : (payload: Payload<Fn>) => R
 
@@ -18,7 +18,12 @@ export type RestArgs<Fn> = Fn extends (_: any, ...args: infer R) => any
   ? R
   : never
 
-export interface ModuleOptions<S, G extends BG0, M extends BM0, A extends BA0> {
+export interface ModuleOptions<
+  S,
+  G extends BG<S>,
+  M extends BM<S>,
+  A extends BA<S, G, M>
+> {
   namespaced?: boolean
   state?: Class<S>
   getters?: Class<G>
@@ -32,7 +37,12 @@ interface ModuleInstance {
   injectStore: (store: Store<any>) => void
 }
 
-export class Module<S, G extends BG0, M extends BM0, A extends BA0> {
+export class Module<
+  S,
+  G extends BG<S>,
+  M extends BM<S>,
+  A extends BA<S, G, M>
+> {
   /* @internal */
   path: string[] | undefined
 
@@ -194,7 +204,12 @@ function createLazyContextPosition(
   }
 }
 
-function initGetters<S, G extends BG0, M extends BM0, A extends BA0>(
+function initGetters<
+  S,
+  G extends BG<S>,
+  M extends BM<S>,
+  A extends BA<S, G, M>
+>(
   Getters: Class<G>,
   module: Module<S, G, M, A>
 ): { getters: GetterTree<any, any>; injectStore: (store: Store<any>) => void } {
@@ -229,7 +244,12 @@ function initGetters<S, G extends BG0, M extends BM0, A extends BA0>(
   }
 }
 
-function initMutations<S, G extends BG0, M extends BM0, A extends BA0>(
+function initMutations<
+  S,
+  G extends BG<S>,
+  M extends BM<S>,
+  A extends BA<S, G, M>
+>(
   Mutations: Class<M>,
   module: Module<S, G, M, A>
 ): { mutations: MutationTree<any>; injectStore: (store: Store<any>) => void } {
@@ -258,7 +278,12 @@ function initMutations<S, G extends BG0, M extends BM0, A extends BA0>(
   }
 }
 
-function initActions<S, G extends BG0, M extends BM0, A extends BA0>(
+function initActions<
+  S,
+  G extends BG<S>,
+  M extends BM<S>,
+  A extends BA<S, G, M>
+>(
   Actions: Class<A>,
   module: Module<S, G, M, A>
 ): { actions: ActionTree<any, any>; injectStore: (store: Store<any>) => void } {

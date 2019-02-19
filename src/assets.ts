@@ -4,7 +4,7 @@ import { Module } from './module'
 
 export class Getters<S = {}> {
   /* @internal */
-  __ctx__!: Context<Module<S, this, BM0, BA0>>
+  __ctx__!: Context<Module<S, this, any, any>>
 
   $init(_store: Store<any>): void {}
 
@@ -19,7 +19,7 @@ export class Getters<S = {}> {
 
 export class Mutations<S = {}> {
   /* @internal */
-  __ctx__!: Context<Module<S, BG0, BM0, BA0>>
+  __ctx__!: Context<Module<S, any, any, any>>
 
   protected get state(): S {
     return this.__ctx__.state
@@ -28,8 +28,8 @@ export class Mutations<S = {}> {
 
 export class Actions<
   S = {},
-  G extends BG0 = Getters,
-  M extends BM0 = Mutations,
+  G extends BG<S> = BG<S>,
+  M extends BM<S> = BM<S>,
   A = {} // We need to specify self action type explicitly to infer dispatch type.
 > {
   /* @internal */
@@ -55,14 +55,12 @@ export class Actions<
 }
 
 // Type aliases for internal use
-export type BG0 = Getters
-export type BG1<S> = Getters<S>
-export type BM0 = Mutations
-export type BA0 = Actions
-export type BA1<S, G extends BG0, M extends BM0> = Actions<S, G, M>
+export type BG<S> = Getters<S>
+export type BM<S> = Mutations<S>
+export type BA<S, G extends BG<S>, M extends BM<S>> = Actions<S, G, M>
 
-export type Payload<T> = T extends () => any
-  ? undefined
+export type Payload<T> = T extends (payload?: infer P) => any
+  ? P | undefined
   : T extends (payload: infer P) => any
   ? P
   : never
