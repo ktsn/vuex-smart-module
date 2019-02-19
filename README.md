@@ -287,7 +287,7 @@ const store = createStore(root)
 Modules have `mapXXX` helpers as methods which are the same interface as Vuex ones. The mapped computed properties and methods are strictly typed. So you will not have some typo or pass wrong payload for them.
 
 ```ts
-import Vue from 'vuex'
+import Vue from 'vue'
 
 // Import foo module
 import { foo } from '@/store/modules/foo'
