@@ -1,3 +1,6 @@
+// Compilation check
+import './types'
+
 import * as assert from 'power-assert'
 import Vue from 'vue'
 import * as Vuex from 'vuex'
