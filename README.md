@@ -330,7 +330,8 @@ export default Vue.extend({
 In the spec file, mock the `mutations` option in the `counter` module. The below is [Jest](https://jestjs.io/) example but the essential idea is the same:
 
 ```ts
-import { shallowMount } from '@vue/test-utils'
+import * as Vuex from 'vuex'
+import { shallowMount, createLocalVue } from '@vue/test-utils'
 import { createStore } from 'vuex-smart-module'
 
 // component which we want to test
@@ -338,6 +339,9 @@ import Counter from '@/components/Counter.vue'
 
 // counter module which we want to mock
 import counter, { CounterMutations } from '@/store/modules/counter'
+
+const localVue = createLocalVue()
+localVue.use(Vuex)
 
 // make sure that you clean mocked object
 const originalMutations = counter.options.mutations
@@ -364,7 +368,7 @@ it('calls increment mutation', () => {
   const store = createStore(counter)
 
   // emulate click event
-  shallowMount(Counter).trigger('click')
+  shallowMount(Counter, { store, localVue }).trigger('click')
 
   // check the mock function was called
   expect(spy).toHaveBeenCalled(spy)
