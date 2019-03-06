@@ -311,6 +311,8 @@ unregisterModule(
 )
 ```
 
+Note that the 3rd argument of `registerModule` which is namespace string must match with the actual namespace that the store resolves. If you pass wrong namespace to it, component mappers and context api would not work correctly.
+
 ### Component Mapper
 
 Modules have `mapXXX` helpers as methods which are the same interface as Vuex ones. The mapped computed properties and methods are strictly typed. So you will not have some typo or pass wrong payload for them.
