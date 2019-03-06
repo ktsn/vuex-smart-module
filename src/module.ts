@@ -53,7 +53,7 @@ export class Module<
     createLazyContextPosition(this)
   )
 
-  constructor(private options: ModuleOptions<S, G, M, A> = {}) {}
+  constructor(public options: ModuleOptions<S, G, M, A> = {}) {}
 
   clone(): Module<S, G, M, A> {
     const options = { ...this.options }
