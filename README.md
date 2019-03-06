@@ -282,6 +282,37 @@ const root = new Module({
 const store = createStore(root)
 ```
 
+### Register Module Dynamically
+
+You can use `registerModule` to register a module and `unregisterModule` to unregister.
+
+```ts
+import { registerModule, unregisterModule } from 'vuex-smart-module'
+import { store } from './store'
+import { foo } from './store/modules/foo'
+
+// register module
+registerModule(
+  store, // store instance
+  ['foo'], // module path. can be string or array of string
+  'foo/', // namespace string which will be when put into the store
+  foo, // module instance
+
+  // module options as same as vuex registerModule
+  {
+    preserveState: true
+  }
+)
+
+// unregister module
+unregisterModule(
+  store, // store instance
+  foo // module instance which you want to unregister
+)
+```
+
+Note that the 3rd argument of `registerModule` which is namespace string must match with the actual namespace that the store resolves. If you pass wrong namespace to it, component mappers and context api would not work correctly.
+
 ### Component Mapper
 
 Modules have `mapXXX` helpers as methods which are the same interface as Vuex ones. The mapped computed properties and methods are strictly typed. So you will not have some typo or pass wrong payload for them.

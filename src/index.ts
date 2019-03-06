@@ -3,6 +3,7 @@ import { Module } from './module'
 
 export { Getters, Mutations, Actions } from './assets'
 export { Context } from './context'
+export { registerModule, unregisterModule } from './register'
 export { Module }
 
 export function createStore(
@@ -11,14 +12,10 @@ export function createStore(
 ): Store<any> {
   const { options: rootModuleOptions, injectStore } = rootModule.create([], '')
 
-  const plugin = (store: Store<any>) => {
-    injectStore(store)
-  }
-
   const store: Store<any> = new Store({
     ...options,
     ...rootModuleOptions,
-    plugins: [plugin].concat(options.plugins || [])
+    plugins: [injectStore].concat(options.plugins || [])
   })
 
   return store
