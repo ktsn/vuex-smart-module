@@ -343,7 +343,7 @@ import counter, { CounterMutations } from '@/store/modules/counter'
 const localVue = createLocalVue()
 localVue.use(Vuex)
 
-// make sure that you clean mocked object
+// make sure that you clean mocked object after each test case
 const originalMutations = counter.options.mutations
 afterEach(() => {
   counter.options.mutations = originalMutations
