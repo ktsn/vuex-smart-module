@@ -337,6 +337,75 @@ export default Vue.extend({
 })
 ```
 
+## Testing
+
+When you want to mock some module assets, you can directly inject mock constructor into module options. For example, you will test the following component which is using `counter` module:
+
+```vue
+<template>
+  <button @click="increment">Increment</button>
+</template>
+
+<script lang="ts">
+import Vue from 'vue'
+
+// use counter module
+import counter from '@/store/modules/counter'
+
+export default Vue.extend({
+  methods: counter.mapMutations(['increment'])
+})
+</script>
+```
+
+In the spec file, mock the `mutations` option in the `counter` module. The below is [Jest](https://jestjs.io/) example but the essential idea is the same:
+
+```ts
+import * as Vuex from 'vuex'
+import { shallowMount, createLocalVue } from '@vue/test-utils'
+import { createStore } from 'vuex-smart-module'
+
+// component which we want to test
+import Counter from '@/components/Counter.vue'
+
+// counter module which we want to mock
+import counter, { CounterMutations } from '@/store/modules/counter'
+
+const localVue = createLocalVue()
+localVue.use(Vuex)
+
+// make sure that you clean mocked object after each test case
+const originalMutations = counter.options.mutations
+afterEach(() => {
+  counter.options.mutations = originalMutations
+})
+
+it('calls increment mutation', () => {
+  // create spy
+  const spy = jest.fn()
+
+  // create mock mutation
+  class MockMutations extends CounterMutations {
+    // override increment method for mock
+    increment() {
+      spy()
+    }
+  }
+
+  // inject mock
+  counter.options.mutations = MockMutations
+
+  // create mock store
+  const store = createStore(counter)
+
+  // emulate click event
+  shallowMount(Counter, { store, localVue }).trigger('click')
+
+  // check the mock function was called
+  expect(spy).toHaveBeenCalled()
+})
+```
+
 ## License
 
 MIT
