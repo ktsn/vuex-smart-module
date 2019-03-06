@@ -371,7 +371,7 @@ it('calls increment mutation', () => {
   shallowMount(Counter, { store, localVue }).trigger('click')
 
   // check the mock function was called
-  expect(spy).toHaveBeenCalled(spy)
+  expect(spy).toHaveBeenCalled()
 })
 ```
 
