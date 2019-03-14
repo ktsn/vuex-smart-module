@@ -2,7 +2,7 @@ import { Store, StoreOptions } from 'vuex'
 import { Module } from './module'
 
 export { Getters, Mutations, Actions } from './assets'
-export { Context } from './context'
+export { Dispatch, Commit, Context } from './context'
 export { registerModule, unregisterModule } from './register'
 export { Module }
 
