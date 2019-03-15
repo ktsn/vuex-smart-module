@@ -232,6 +232,29 @@ describe('Module', () => {
 
       createStore(root)
     })
+
+    it('collects parent getters', () => {
+      class SuperGetters extends Getters {
+        get a() {
+          return 1
+        }
+      }
+
+      class ChildGetters extends SuperGetters {
+        get b() {
+          return 2
+        }
+      }
+
+      const root = new Module({
+        getters: ChildGetters
+      })
+
+      const store = createStore(root)
+
+      assert(store.getters.a === 1)
+      assert(store.getters.b === 2)
+    })
   })
 
   describe('mutations', () => {
@@ -244,6 +267,31 @@ describe('Module', () => {
       const store = createStore(root)
       store.commit('inc')
       assert(store.state.value === 2)
+    })
+
+    it('collects parent mutations', () => {
+      class SuperMutations extends Mutations<FooState> {
+        inc() {
+          this.state.value++
+        }
+      }
+
+      class ChildMutations extends SuperMutations {
+        dec() {
+          this.state.value--
+        }
+      }
+
+      const root = new Module({
+        state: FooState,
+        mutations: ChildMutations
+      })
+
+      const store = createStore(root)
+      store.commit('inc')
+      assert(store.state.value === 2)
+      store.commit('dec')
+      assert(store.state.value === 1)
     })
   })
 
@@ -327,6 +375,35 @@ describe('Module', () => {
       })
 
       createStore(root)
+    })
+
+    it('collects parent actions', () => {
+      class ParentActions<
+        A extends Actions<FooState, never, FooMutations>
+      > extends Actions<FooState, never, FooMutations, A> {
+        inc() {
+          this.commit('inc', undefined)
+        }
+      }
+
+      class ChildActions extends ParentActions<ChildActions> {
+        doubleInc() {
+          this.commit('inc', undefined)
+          this.commit('inc', undefined)
+        }
+      }
+
+      const root = new Module({
+        state: FooState,
+        mutations: FooMutations,
+        actions: ChildActions
+      })
+
+      const store = createStore(root)
+      store.dispatch('inc')
+      assert(store.state.value === 2)
+      store.dispatch('doubleInc')
+      assert(store.state.value === 4)
     })
   })
 
