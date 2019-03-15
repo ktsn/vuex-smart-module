@@ -5,7 +5,15 @@ import {
   MutationTree,
   ActionTree
 } from 'vuex'
-import { Payload, BA, BG, BM } from './assets'
+import {
+  Payload,
+  Getters as BaseGetters,
+  Mutations as BaseMutations,
+  Actions as BaseActions,
+  BA,
+  BG,
+  BM
+} from './assets'
 import { assert, Class, mapValues, noop, combine } from './utils'
 import { Context, ContextPosition, Commit, Dispatch } from './context'
 import { ComponentMapper } from './mapper'
@@ -216,11 +224,8 @@ function initGetters<
   const getters = new Getters()
   const options: GetterTree<any, any> = {}
 
-  Object.getOwnPropertyNames(Getters.prototype).forEach(key => {
-    if (key === 'constructor') return
-
-    const desc = Object.getOwnPropertyDescriptor(Getters.prototype, key)
-    if (!desc || (typeof desc.value !== 'function' && !desc.get)) {
+  traverseDescriptors(Getters.prototype, BaseGetters, (desc, key) => {
+    if (typeof desc.value !== 'function' && !desc.get) {
       return
     }
 
@@ -256,11 +261,8 @@ function initMutations<
   const mutations = new Mutations()
   const options: MutationTree<any> = {}
 
-  Object.getOwnPropertyNames(Mutations.prototype).forEach(key => {
-    if (key === 'constructor') return
-
-    const desc = Object.getOwnPropertyDescriptor(Mutations.prototype, key)
-    if (!desc || typeof desc.value !== 'function') {
+  traverseDescriptors(Mutations.prototype, BaseMutations, (desc, key) => {
+    if (typeof desc.value !== 'function') {
       return
     }
 
@@ -290,11 +292,8 @@ function initActions<
   const actions = new Actions()
   const options: ActionTree<any, any> = {}
 
-  Object.getOwnPropertyNames(Actions.prototype).forEach(key => {
-    if (key === 'constructor') return
-
-    const desc = Object.getOwnPropertyDescriptor(Actions.prototype, key)
-    if (!desc || typeof desc.value !== 'function') {
+  traverseDescriptors(Actions.prototype, BaseActions, (desc, key) => {
+    if (typeof desc.value !== 'function') {
       return
     }
 
@@ -313,4 +312,26 @@ function initActions<
       actions.$init(store)
     }
   }
+}
+
+function traverseDescriptors(
+  proto: Object,
+  Base: Function,
+  fn: (desc: PropertyDescriptor, key: string) => void,
+  exclude: Record<string, boolean> = { constructor: true }
+): void {
+  if (proto.constructor === Base) {
+    return
+  }
+
+  Object.getOwnPropertyNames(proto).forEach(key => {
+    // Ensure to only choose most extended properties
+    if (exclude[key]) return
+    exclude[key] = true
+
+    const desc = Object.getOwnPropertyDescriptor(proto, key)!
+    fn(desc, key)
+  })
+
+  traverseDescriptors(Object.getPrototypeOf(proto), Base, fn, exclude)
 }
