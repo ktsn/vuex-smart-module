@@ -96,7 +96,7 @@ export class Module<
 
   mapMutations<K extends keyof M>(
     map: K[]
-  ): { [Key in K]: MappedFunction<M[K], void> }
+  ): { [Key in K]: MappedFunction<M[Key], void> }
   mapMutations<T extends Record<string, keyof M>>(
     map: T
   ): { [Key in keyof T]: MappedFunction<M[T[Key] & keyof M], void> }
@@ -111,7 +111,7 @@ export class Module<
 
   mapActions<K extends keyof A>(
     map: K[]
-  ): { [Key in K]: MappedFunction<A[K], Promise<any>> }
+  ): { [Key in K]: MappedFunction<A[Key], Promise<any>> }
   mapActions<T extends Record<string, keyof A>>(
     map: T
   ): { [Key in keyof T]: MappedFunction<A[T[Key] & keyof A], Promise<any>> }
