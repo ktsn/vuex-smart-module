@@ -1,9 +1,17 @@
 import * as Vuex from 'vuex'
-import { Module, Mutations, createStore } from '../src'
+import * as assert from 'power-assert'
+import { Module, Mutations, createStore, Getters, Actions } from '../src'
 import { createLocalVue } from '@vue/test-utils'
+import { inject } from '../src/assets'
 
 class TestState {
   count = 0
+}
+
+class TestGetters extends Getters<TestState> {
+  get double() {
+    return this.state.count * 2
+  }
 }
 
 class TestMutations extends Mutations<TestState> {
@@ -12,9 +20,22 @@ class TestMutations extends Mutations<TestState> {
   }
 }
 
+class TestActions extends Actions<
+  TestState,
+  TestGetters,
+  TestMutations,
+  TestActions
+> {
+  inc() {
+    this.commit('inc', undefined)
+  }
+}
+
 const test = new Module({
   state: TestState,
-  mutations: TestMutations
+  getters: TestGetters,
+  mutations: TestMutations,
+  actions: TestActions
 })
 
 const localVue = createLocalVue()
@@ -37,5 +58,35 @@ describe('testability', () => {
     const store = createStore(test)
 
     store.commit('inc')
+  })
+
+  it('tests getters', () => {
+    const getters = inject(TestGetters, {
+      state: {
+        count: 5
+      }
+    })
+    assert(getters.double === 10)
+  })
+
+  it('tests mutations', () => {
+    const state = {
+      count: 10
+    }
+    const mutations = inject(TestMutations, {
+      state
+    })
+    mutations.inc()
+    assert(state.count === 11)
+  })
+
+  it('tests actions', done => {
+    const actions = inject(TestActions, {
+      commit(type: string) {
+        assert(type === 'inc')
+        done()
+      }
+    })
+    actions.inc()
   })
 })
