@@ -202,20 +202,19 @@ Getters and actions class can have a special method `$init` which will be called
 ```ts
 import { Store } from 'vuex'
 import { Actions } from 'vuex-smart-module'
-import { AxiosInstance } from 'axios'
 
 class FooActions extends Actions {
   // Declare dependency type
-  axios: AxiosInstance
+  store: Store<any>
 
   // Called after the module is initialized
   $init(store: Store<any>): void {
-    // Retain axios instance for later
-    this.axios = store.$axios
+    // Retain store instance for later
+    this.store = store
   }
 
   async fetch(): Promise<void> {
-    console.log(await this.axios.get('...'))
+    console.log(await this.store.$axios.$get('...'))
   }
 }
 ```
