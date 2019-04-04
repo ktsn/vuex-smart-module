@@ -70,7 +70,7 @@ class FooActions extends Actions<
 
     return new Promise(resolve => {
       setTimeout(() => {
-        this.commit('inc', payload.amount)
+        this.commit('increment', payload.amount)
       }, payload.interval)
     })
   }
@@ -338,6 +338,45 @@ export default Vue.extend({
 ```
 
 ## Testing
+
+### Unit testing getters, mutations and actions
+
+vuex-smart-module provides `inject` helper function which allow you to inject mock dependencies into getters, mutations and actions instance. You can inject any properties for test:
+
+```ts
+import { inject } from 'vuex-smart-module'
+import { FooGetters, FooActions } from '@/store/modules/foo'
+
+it('returns doubled value', () => {
+  // Inject mock state into getters
+  const getters = inject(FooGetters, {
+    state: {
+      count: 5
+    }
+  })
+
+  // Test double getter
+  expect(getters.double).toBe(10)
+})
+
+it('increments asynchronously', async () => {
+  // Inject mock commit method
+  const commit = jest.fn()
+  const actions = inject(FooActions, {
+    commit
+  })
+
+  await actions.incrementAsync({
+    amount: 3
+    interval: 1
+  })
+
+  // Check mock commit method is called
+  expect(commit).toHaveBeenCalledWith('increment', 3)
+})
+```
+
+### Mocking modules to test components
 
 When you want to mock some module assets, you can directly inject mock constructor into module options. For example, you will test the following component which is using `counter` module:
 
