@@ -113,9 +113,9 @@ export function getters(store: Store<any>, namespace: string): any {
   const getters: Record<string, any> = {}
 
   Object.keys(store.getters).forEach(key => {
-    const sameNamespace = namespace !== key.slice(0, sliceIndex)
+    const sameNamespace = namespace === key.slice(0, sliceIndex)
     const name = key.slice(sliceIndex)
-    if (sameNamespace && name) {
+    if (!sameNamespace || !name) {
       return
     }
 
