@@ -1,6 +1,6 @@
 {
   "name": "vuex-smart-module",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "author": "katashin",
   "description": "Type safe Vuex module with powerful module features",
   "keywords": [
