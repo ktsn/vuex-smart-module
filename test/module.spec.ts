@@ -470,6 +470,44 @@ describe('Module', () => {
 
       assert(store.getters['test/triple'] === 3)
     })
+
+    it('edge case: local getters should not try to register an empty getter', () => {
+      class FooGetters extends Getters {
+        get test() {
+          return 1
+        }
+      }
+
+      class BarGetters extends Getters {
+        get a() {
+          return 2
+        }
+
+        get b() {
+          return 3
+        }
+      }
+
+      const foo = new Module({
+        getters: FooGetters
+      })
+
+      const bar = new Module({
+        namespaced: false,
+        getters: BarGetters
+      })
+
+      const store = createStore(
+        new Module({
+          modules: {
+            foo,
+            bar
+          }
+        })
+      )
+
+      assert(foo.context(store).getters.test === 1)
+    })
   })
 
   it("can be used in other module's action", () => {
