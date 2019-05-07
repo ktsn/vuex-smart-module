@@ -79,7 +79,12 @@ export class Module<
   }
 
   context(store: Store<any>): Context<this> {
-    return new Context(createLazyContextPosition(this), store)
+    return new Context(
+      createLazyContextPosition(this),
+      store,
+      this.options.mutations,
+      this.options.actions
+    )
   }
 
   mapState<K extends keyof S>(map: K[]): { [Key in K]: () => S[Key] }

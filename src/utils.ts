@@ -54,3 +54,14 @@ export function traverseDescriptors(
 
   traverseDescriptors(Object.getPrototypeOf(proto), Base, fn, exclude)
 }
+
+export function gatherHandlerNames(proto: Object, Base: Function): string[] {
+  const ret: string[] = []
+  traverseDescriptors(proto, Base, (desc, name) => {
+    if (typeof desc.value !== 'function') {
+      return
+    }
+    ret.push(name)
+  })
+  return ret
+}

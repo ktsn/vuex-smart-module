@@ -1,6 +1,12 @@
 import { Store, CommitOptions, DispatchOptions } from 'vuex'
-import { Payload } from './assets'
-import { get } from './utils'
+import {
+  Payload,
+  Mutations as BaseMutations,
+  Actions as BaseActions,
+  Dispatcher,
+  Committer
+} from './assets'
+import { get, Class, gatherHandlerNames } from './utils'
 import { Module } from './module'
 
 export interface Commit<M> {
@@ -129,8 +135,55 @@ export function getters(store: Store<any>, namespace: string): any {
 }
 
 export class Context<Mod extends Module<any, any, any, any>> {
+  private __mutations__?: Committer<Mutations<Mod>>
+  private __actions__?: Dispatcher<Actions<Mod>>
   /** @internal */
-  constructor(private pos: ContextPosition, private store: Store<any>) {}
+  constructor(
+    private pos: ContextPosition,
+    private store: Store<any>,
+    private mutationsClass: Class<unknown> | undefined,
+    private actionsClass: Class<unknown> | undefined
+  ) {}
+
+  get mutations(): Committer<Mutations<Mod>> {
+    if (this.__mutations__) {
+      return this.__mutations__
+    }
+    const mutations: Record<string, any> = {}
+    if (this.mutationsClass) {
+      const mutationNames = gatherHandlerNames(
+        this.mutationsClass.prototype,
+        BaseMutations
+      )
+      mutationNames.forEach(name => {
+        Object.defineProperty(mutations, name, {
+          value: (payload: any) => this.commit(name, payload),
+          enumerable: true
+        })
+      })
+    }
+    return (this.__mutations__ = mutations as any)
+  }
+
+  get actions(): Dispatcher<Actions<Mod>> {
+    if (this.__actions__) {
+      return this.__actions__
+    }
+    const actions: Record<string, any> = {}
+    if (this.actionsClass) {
+      const actionNames = gatherHandlerNames(
+        this.actionsClass.prototype,
+        BaseActions
+      )
+      actionNames.forEach(name => {
+        Object.defineProperty(actions, name, {
+          value: (payload: any) => this.dispatch(name, payload),
+          enumerable: true
+        })
+      })
+    }
+    return (this.__actions__ = actions as any)
+  }
 
   commit: Commit<Mutations<Mod>> = (
     type: any,
