@@ -1,4 +1,3 @@
-/* eslint-disable typescript/no-var-requires */
 const path = require('path')
 const glob = require('glob')
 
@@ -15,7 +14,14 @@ module.exports = {
     rules: [
       {
         test: /\.ts$/,
-        use: ['ts-loader']
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true
+            }
+          }
+        ]
       },
 
       {

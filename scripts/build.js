@@ -1,4 +1,3 @@
-/* eslint-disable typescript/no-var-requires */
 const fs = require('fs')
 const { rollup } = require('rollup')
 const replace = require('rollup-plugin-replace')
