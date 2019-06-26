@@ -1,6 +1,6 @@
 import { Store } from 'vuex'
 import { Commit, Dispatch, Context } from './context'
-import { Module } from './module'
+import { Module, MappedFunction } from './module'
 
 interface Class<T> {
   new (...args: any[]): T
@@ -87,6 +87,26 @@ export class Actions<
   protected get dispatch(): Dispatch<A> {
     return this.__ctx__.dispatch
   }
+
+  protected get actions(): Dispatcher<A> {
+    return this.__ctx__.actions
+  }
+
+  protected get mutations(): Committer<M> {
+    return this.__ctx__.mutations
+  }
+}
+
+export type Committer<M> = {
+  [K in keyof M]: Payload<M[K]> extends never
+    ? never
+    : MappedFunction<M[K], void>
+}
+
+export type Dispatcher<A> = {
+  [K in keyof A]: Payload<A[K]> extends never
+    ? never
+    : MappedFunction<A[K], Promise<any>>
 }
 
 // Type aliases for internal use

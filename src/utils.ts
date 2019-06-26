@@ -32,3 +32,36 @@ export function assert(condition: any, message: string): void {
     throw new Error(`[vuex-smart-module] ${message}`)
   }
 }
+
+export function traverseDescriptors(
+  proto: Object,
+  Base: Function,
+  fn: (desc: PropertyDescriptor, key: string) => void,
+  exclude: Record<string, boolean> = { constructor: true }
+): void {
+  if (proto.constructor === Base) {
+    return
+  }
+
+  Object.getOwnPropertyNames(proto).forEach(key => {
+    // Ensure to only choose most extended properties
+    if (exclude[key]) return
+    exclude[key] = true
+
+    const desc = Object.getOwnPropertyDescriptor(proto, key)!
+    fn(desc, key)
+  })
+
+  traverseDescriptors(Object.getPrototypeOf(proto), Base, fn, exclude)
+}
+
+export function gatherHandlerNames(proto: Object, Base: Function): string[] {
+  const ret: string[] = []
+  traverseDescriptors(proto, Base, (desc, name) => {
+    if (typeof desc.value !== 'function') {
+      return
+    }
+    ret.push(name)
+  })
+  return ret
+}

@@ -14,7 +14,14 @@ import {
   BG,
   BM
 } from './assets'
-import { assert, Class, mapValues, noop, combine } from './utils'
+import {
+  assert,
+  Class,
+  mapValues,
+  noop,
+  combine,
+  traverseDescriptors
+} from './utils'
 import { Context, ContextPosition, Commit, Dispatch } from './context'
 import { ComponentMapper } from './mapper'
 
@@ -72,7 +79,12 @@ export class Module<
   }
 
   context(store: Store<any>): Context<this> {
-    return new Context(createLazyContextPosition(this), store)
+    return new Context(
+      createLazyContextPosition(this),
+      store,
+      this.options.mutations,
+      this.options.actions
+    )
   }
 
   mapState<K extends keyof S>(map: K[]): { [Key in K]: () => S[Key] }
@@ -312,26 +324,4 @@ function initActions<
       actions.$init(store)
     }
   }
-}
-
-function traverseDescriptors(
-  proto: Object,
-  Base: Function,
-  fn: (desc: PropertyDescriptor, key: string) => void,
-  exclude: Record<string, boolean> = { constructor: true }
-): void {
-  if (proto.constructor === Base) {
-    return
-  }
-
-  Object.getOwnPropertyNames(proto).forEach(key => {
-    // Ensure to only choose most extended properties
-    if (exclude[key]) return
-    exclude[key] = true
-
-    const desc = Object.getOwnPropertyDescriptor(proto, key)!
-    fn(desc, key)
-  })
-
-  traverseDescriptors(Object.getPrototypeOf(proto), Base, fn, exclude)
 }
