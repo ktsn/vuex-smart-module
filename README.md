@@ -336,6 +336,43 @@ export default Vue.extend({
 })
 ```
 
+### Method Style Access for Actions and Mutations
+
+`this` in an action and a module context have `actions` and `mutations` properties. They contains module actions and mutations in method form. You can use them instead of via `dispatch` or `commit` if you prefer method call style than event emitter style.
+
+The method style has several advantages that you can use _Go to definition_ for your actions and mutations and it prints simple and easier to understand errors if you pass wrong payload type, for example.
+
+Example usage in an action:
+
+```ts
+import { Actions } from 'vuex-smart-module'
+
+class FooActions extends Actions<FooState, FooGetters, FooMutations, FooActions> {
+  increment(amount: number)
+    // Call `increment` mutation
+    this.mutations.increment(payload)
+  }
+}
+```
+
+Example usage via a context:
+
+```ts
+import Vue from 'vue'
+
+// Import foo module
+import { foo } from '@/store/modules/foo'
+
+export default Vue.extend({
+  mounted() {
+    const ctx = foo.context(this.store)
+
+    // Call `increment` action
+    ctx.actions.increment(1)
+  }
+})
+```
+
 ## Testing
 
 ### Unit testing getters, mutations and actions
