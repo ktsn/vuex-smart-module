@@ -28,3 +28,29 @@ export function shouldInferUnionTypeContainsUndefined() {
   ctx.commit('test', undefined)
   ctx.commit('test', false)
 }
+
+// https://github.com/ktsn/vuex-smart-module/issues/30
+export function canDeclareRecursiveModuleType() {
+  class ChildActions extends Actions<{}, never, never, ChildActions> {
+    rootModule!: RootModule
+
+    child() {}
+  }
+
+  const child = new Module({
+    actions: ChildActions
+  })
+
+  class RootActions extends Actions<{}, never, never, RootActions> {
+    root() {}
+  }
+
+  type RootModule = typeof root
+
+  const root = new Module({
+    actions: RootActions,
+    modules: {
+      child
+    }
+  })
+}
