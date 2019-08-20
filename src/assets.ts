@@ -88,8 +88,14 @@ export class Actions<
     return this.__ctx__.dispatch
   }
 
-  protected get actions(): Dispatcher<A> {
-    return this.__ctx__.actions
+  /**
+   * IMPORTANT: Each action type maybe incorrect - return type of all actions should be `Promise<any>`
+   * but the ones under `actions` are same as what you declared in this actions class.
+   * The reason why we declare the type in such way is to avoid recursive type error.
+   * See: https://github.com/ktsn/vuex-smart-module/issues/30
+   */
+  protected get actions(): A {
+    return (this.__ctx__.actions as unknown) as A
   }
 
   protected get mutations(): Committer<M> {
