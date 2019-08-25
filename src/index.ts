@@ -1,4 +1,4 @@
-import { Store, StoreOptions } from 'vuex'
+import { Store, StoreOptions } from 'vuex/types'
 import { Module } from './module'
 
 export { Getters, Mutations, Actions, inject } from './assets'

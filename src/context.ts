@@ -1,4 +1,4 @@
-import { Store, CommitOptions, DispatchOptions } from 'vuex'
+import { Store, CommitOptions, DispatchOptions } from 'vuex/types'
 import {
   Payload,
   Mutations as BaseMutations,

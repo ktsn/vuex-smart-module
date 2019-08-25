@@ -1,4 +1,4 @@
-import { Store } from 'vuex'
+import { Store } from 'vuex/types'
 import { Commit, Dispatch, Context } from './context'
 import { Module, MappedFunction } from './module'
 

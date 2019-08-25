@@ -1,4 +1,4 @@
-import { Store, ModuleOptions } from 'vuex'
+import { Store, ModuleOptions } from 'vuex/types'
 import { Module } from './module'
 import { assert } from './utils'
 

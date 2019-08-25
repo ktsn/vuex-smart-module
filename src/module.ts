@@ -4,7 +4,7 @@ import {
   GetterTree,
   MutationTree,
   ActionTree
-} from 'vuex'
+} from 'vuex/types'
 import {
   Payload,
   Getters as BaseGetters,
