@@ -6,7 +6,7 @@ import {
   Dispatcher,
   Committer
 } from './assets'
-import { get, Class, gatherHandlerNames } from './utils'
+import { get, Class, gatherHandlerNames, assert } from './utils'
 import { Module } from './module'
 
 export interface Commit<M> {
@@ -72,6 +72,25 @@ type Actions<Mod extends Module<any, any, any, any>> = Mod extends Module<
 export interface ContextPosition {
   path: string[]
   namespace: string
+}
+
+export function createLazyContextPosition(
+  module: Module<any, any, any, any>
+): ContextPosition {
+  const message =
+    'The module need to be registered a store before using `Module#context` or `createMapper`'
+
+  return {
+    get path() {
+      assert(module.path !== undefined, message)
+      return module.path!
+    },
+
+    get namespace() {
+      assert(module.namespace !== undefined, message)
+      return module.namespace!
+    }
+  }
 }
 
 function normalizedDispatch(

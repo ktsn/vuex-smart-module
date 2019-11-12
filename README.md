@@ -314,18 +314,31 @@ Note that the 3rd argument of `registerModule` which is namespace string must ma
 
 ### Component Mapper
 
-Modules have `mapXXX` helpers as methods which are the same interface as Vuex ones. The mapped computed properties and methods are strictly typed. So you will not have some typo or pass wrong payload for them.
+You can generate `mapXXX` helpers, which are the same interface as Vuex ones, for each associated module by using `createMapper` function. The mapped computed properties and methods are strictly typed. So you will not have some typo or pass wrong payload for them.
+
+```ts
+// @/store/modules/foo
+import { Module, createMapper } from 'vuex-smart-module'
+
+// Create module
+export const foo = new Module({
+  // ...
+})
+
+// Create mapper
+export const fooMapper = createMapper(foo)
+```
 
 ```ts
 import Vue from 'vue'
 
-// Import foo module
-import { foo } from '@/store/modules/foo'
+// Import foo mapper
+import { fooMapper } from '@/store/modules/foo'
 
 export default Vue.extend({
-  computed: foo.mapGetters(['double']),
+  computed: fooMapper.mapGetters(['double']),
 
-  methods: foo.mapActions({
+  methods: fooMapper.mapActions({
     incAsync: 'incrementAsync'
   }),
 
@@ -424,11 +437,11 @@ When you want to mock some module assets, you can directly inject mock construct
 <script lang="ts">
 import Vue from 'vue'
 
-// use counter module
-import counter from '@/store/modules/counter'
+// use counter Mapper
+import { counterMapper } from '@/store/modules/counter'
 
 export default Vue.extend({
-  methods: counter.mapMutations(['increment'])
+  methods: counterMapper.mapMutations(['increment'])
 })
 </script>
 ```

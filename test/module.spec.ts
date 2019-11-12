@@ -11,7 +11,8 @@ import {
   Mutations,
   Actions,
   Module,
-  Context
+  Context,
+  createMapper
 } from '../src'
 
 const localVue = createLocalVue()
@@ -703,7 +704,7 @@ describe('Module', () => {
   })
 
   describe('component mappers', () => {
-    const foo = new Module({
+    const fooModule = new Module({
       state: FooState,
       getters: FooGetters,
       mutations: FooMutations,
@@ -712,9 +713,11 @@ describe('Module', () => {
 
     const root = new Module({
       modules: {
-        foo
+        foo: fooModule
       }
     })
+
+    const foo = createMapper(fooModule)
 
     let store: Vuex.Store<any>
 

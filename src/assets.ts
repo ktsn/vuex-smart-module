@@ -1,6 +1,7 @@
 import { Store } from 'vuex'
 import { Commit, Dispatch, Context } from './context'
-import { Module, MappedFunction } from './module'
+import { Module } from './module'
+import { MappedFunction } from './mapper'
 
 interface Class<T> {
   new (...args: any[]): T
