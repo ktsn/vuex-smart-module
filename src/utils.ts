@@ -33,6 +33,10 @@ export function assert(condition: any, message: string): void {
   }
 }
 
+export function deprecated(message: string): void {
+  console.warn(`[vuex-smart-module] DEPRECATED: ${message}`)
+}
+
 export function traverseDescriptors(
   proto: Object,
   Base: Function,
