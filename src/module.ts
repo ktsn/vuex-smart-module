@@ -6,7 +6,6 @@ import {
   ActionTree
 } from 'vuex'
 import {
-  Payload,
   Getters as BaseGetters,
   Mutations as BaseMutations,
   Actions as BaseActions,
@@ -21,18 +20,11 @@ import {
   noop,
   combine,
   traverseDescriptors,
-  error
+  error,
+  deprecated
 } from './utils'
-import { Context, ContextPosition, Commit, Dispatch } from './context'
-import { ComponentMapper } from './mapper'
-
-export type MappedFunction<Fn, R> = undefined extends Payload<Fn>
-  ? (payload?: Payload<Fn>) => R
-  : (payload: Payload<Fn>) => R
-
-export type RestArgs<Fn> = Fn extends (_: any, ...args: infer R) => any
-  ? R
-  : never
+import { Context, Commit, Dispatch, createLazyContextPosition } from './context'
+import { ComponentMapper, MappedFunction, RestArgs } from './mapper'
 
 export interface ModuleOptions<
   S,
@@ -65,7 +57,7 @@ export class Module<
   /* @internal */
   namespace: string | undefined
 
-  private mapper: ComponentMapper = new ComponentMapper(
+  private mapper: ComponentMapper<S, G, M, A> = new ComponentMapper<S, G, M, A>(
     createLazyContextPosition(this)
   )
 
@@ -96,6 +88,7 @@ export class Module<
     map: T
   ): { [Key in keyof T]: () => ReturnType<T[Key]> }
   mapState(map: any): { [key: string]: () => any } {
+    deprecated('`Module#mapState` is deprecated. Use `createMapper` instead.')
     return this.mapper.mapState(map)
   }
 
@@ -104,6 +97,7 @@ export class Module<
     map: T
   ): { [Key in keyof T]: () => G[T[Key] & keyof G] }
   mapGetters(map: any): { [key: string]: () => any } {
+    deprecated('`Module#mapGetters` is deprecated. Use `createMapper` instead.')
     return this.mapper.mapGetters(map)
   }
 
@@ -119,6 +113,9 @@ export class Module<
     map: T
   ): { [Key in keyof T]: (...args: RestArgs<T[Key]>) => ReturnType<T[Key]> }
   mapMutations(map: any): { [key: string]: (...args: any[]) => any } {
+    deprecated(
+      '`Module#mapMutations` is deprecated. Use `createMapper` instead.'
+    )
     return this.mapper.mapMutations(map)
   }
 
@@ -134,6 +131,7 @@ export class Module<
     map: T
   ): { [Key in keyof T]: (...args: RestArgs<T[Key]>) => ReturnType<T[Key]> }
   mapActions(map: any): { [key: string]: (...args: any[]) => any } {
+    deprecated('`Module#mapActions` is deprecated. Use `createMapper` instead.')
     return this.mapper.mapActions(map)
   }
 
@@ -202,25 +200,6 @@ export class Module<
         mutationsInstance ? mutationsInstance.injectStore : noop,
         actionsInstance ? actionsInstance.injectStore : noop
       )
-    }
-  }
-}
-
-function createLazyContextPosition(
-  module: Module<any, any, any, any>
-): ContextPosition {
-  const message =
-    'The module need to be registered a store before using `context` or `componentMapper`'
-
-  return {
-    get path() {
-      assert(module.path !== undefined, message)
-      return module.path!
-    },
-
-    get namespace() {
-      assert(module.namespace !== undefined, message)
-      return module.namespace!
     }
   }
 }
