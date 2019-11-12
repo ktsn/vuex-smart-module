@@ -2,6 +2,7 @@
 import './types'
 
 import * as assert from 'power-assert'
+import * as td from 'testdouble'
 import Vue from 'vue'
 import * as Vuex from 'vuex'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
@@ -61,6 +62,11 @@ describe('Module', () => {
       })
     }
   }
+
+  const originalError = console.error
+  afterEach(() => {
+    console.error = originalError
+  })
 
   describe('generate', () => {
     it('generates vuex module', () => {
@@ -267,6 +273,60 @@ describe('Module', () => {
       assert(store.getters.a === 1)
       assert(store.getters.b === 2)
     })
+
+    it('warns if accessing another getter directly (property)', () => {
+      class TestGetters extends Getters {
+        get a() {
+          return 'a'
+        }
+
+        get b() {
+          return this.a
+        }
+      }
+
+      console.error = td.function() as any
+
+      const root = new Module({
+        getters: TestGetters
+      })
+      const store = createStore(root)
+
+      assert(store.getters.b === 'a')
+      td.verify(
+        console.error(
+          '[vuex-smart-module] You are accessing TestGetters#a from TestGetters#b but direct access to another getter is prohibitted.' +
+            ' Access it via this.getters.a instead.'
+        )
+      )
+    })
+
+    it('warns if accessing antoher getter directly (method)', () => {
+      class TestGetters extends Getters {
+        a() {
+          return 'a'
+        }
+
+        b() {
+          return this.a()
+        }
+      }
+
+      console.error = td.function() as any
+
+      const root = new Module({
+        getters: TestGetters
+      })
+      const store = createStore(root)
+
+      assert(store.getters.b() === 'a')
+      td.verify(
+        console.error(
+          '[vuex-smart-module] You are accessing TestGetters#a from TestGetters#b but direct access to another getter is prohibitted.' +
+            ' Access it via this.getters.a instead.'
+        )
+      )
+    })
   })
 
   describe('mutations', () => {
@@ -304,6 +364,31 @@ describe('Module', () => {
       assert(store.state.value === 2)
       store.commit('dec')
       assert(store.state.value === 1)
+    })
+
+    it('warns if accessing another mutation', () => {
+      class TestMutations extends Mutations {
+        a() {}
+        b() {
+          this.a()
+        }
+      }
+
+      const root = new Module({
+        mutations: TestMutations
+      })
+
+      const store = createStore(root)
+
+      console.error = td.function() as any
+      store.commit('b')
+
+      td.verify(
+        console.error(
+          '[vuex-smart-module] You are accessing TestMutations#a from TestMutations#b but accessing another mutation is prohibitted.' +
+            ' Use an action to consolidate the mutation chain.'
+        )
+      )
     })
   })
 
@@ -416,6 +501,31 @@ describe('Module', () => {
       assert(store.state.value === 2)
       store.dispatch('doubleInc')
       assert(store.state.value === 4)
+    })
+
+    it('warns if accessing another action directly', () => {
+      class TestActions extends Actions {
+        a() {}
+        b() {
+          this.a()
+        }
+      }
+
+      const root = new Module({
+        actions: TestActions
+      })
+
+      const store = createStore(root)
+
+      console.error = td.function() as any
+      store.dispatch('b')
+
+      td.verify(
+        console.error(
+          '[vuex-smart-module] You are accessing TestActions#a from TestActions#b but direct access to another action is prohibitted.' +
+            " Access it via this.dispatch('a') instead."
+        )
+      )
     })
 
     describe('sinai style dispatch', () => {

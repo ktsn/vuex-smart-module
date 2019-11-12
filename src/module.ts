@@ -20,6 +20,7 @@ import {
   noop,
   combine,
   traverseDescriptors,
+  error,
   deprecated
 } from './utils'
 import { Context, Commit, Dispatch, createLazyContextPosition } from './context'
@@ -212,17 +213,49 @@ function initGetters<
   Getters: Class<G>,
   module: Module<S, G, M, A>
 ): { getters: GetterTree<any, any>; injectStore: (store: Store<any>) => void } {
-  const getters = new Getters()
+  const getters: any = new Getters()
   const options: GetterTree<any, any> = {}
+
+  // Proxy all getters to print useful warning on development
+  function proxyGetters(getters: any, origin: string): any {
+    const proxy = Object.create(getters)
+    Object.keys(options).forEach(key => {
+      Object.defineProperty(proxy, key, {
+        get() {
+          error(
+            `You are accessing ${Getters.name}#${key} from ${Getters.name}#${origin}` +
+              ' but direct access to another getter is prohibitted.' +
+              ` Access it via this.getters.${key} instead.`
+          )
+          return getters[key]
+        },
+        configurable: true
+      })
+    })
+    return proxy
+  }
 
   traverseDescriptors(Getters.prototype, BaseGetters, (desc, key) => {
     if (typeof desc.value !== 'function' && !desc.get) {
       return
     }
 
+    const methodFn = desc.value
+    const getterFn = desc.get
+
     options[key] = () => {
-      const res = (getters as any)[key]
-      return typeof res === 'function' ? res.bind(getters) : res
+      const proxy =
+        process.env.NODE_ENV === 'production'
+          ? getters
+          : proxyGetters(getters, key)
+
+      if (getterFn) {
+        return getterFn.call(proxy)
+      }
+
+      if (methodFn) {
+        return methodFn.bind(proxy)
+      }
     }
   })
 
@@ -249,15 +282,38 @@ function initMutations<
   Mutations: Class<M>,
   module: Module<S, G, M, A>
 ): { mutations: MutationTree<any>; injectStore: (store: Store<any>) => void } {
-  const mutations = new Mutations()
+  const mutations: any = new Mutations()
   const options: MutationTree<any> = {}
+
+  // Proxy all mutations to print useful warning on development
+  function proxyMutations(mutations: any, origin: string): any {
+    const proxy = Object.create(mutations)
+    Object.keys(options).forEach(key => {
+      proxy[key] = (...args: any[]) => {
+        error(
+          `You are accessing ${Mutations.name}#${key} from ${Mutations.name}#${origin}` +
+            ' but accessing another mutation is prohibitted.' +
+            ' Use an action to consolidate the mutation chain.'
+        )
+        mutations[key].apply(mutations, args)
+      }
+    })
+    return proxy
+  }
 
   traverseDescriptors(Mutations.prototype, BaseMutations, (desc, key) => {
     if (typeof desc.value !== 'function') {
       return
     }
 
-    options[key] = (_: any, payload: any) => (mutations as any)[key](payload)
+    options[key] = (_: any, payload: any) => {
+      const proxy =
+        process.env.NODE_ENV === 'production'
+          ? mutations
+          : proxyMutations(mutations, key)
+
+      return mutations[key].call(proxy, payload)
+    }
   })
 
   return {
@@ -280,15 +336,37 @@ function initActions<
   Actions: Class<A>,
   module: Module<S, G, M, A>
 ): { actions: ActionTree<any, any>; injectStore: (store: Store<any>) => void } {
-  const actions = new Actions()
+  const actions: any = new Actions()
   const options: ActionTree<any, any> = {}
+
+  // Proxy all actions to print useful warning on development
+  function proxyActions(actions: any, origin: string): any {
+    const proxy = Object.create(actions)
+    Object.keys(options).forEach(key => {
+      proxy[key] = (...args: any[]) => {
+        error(
+          `You are accessing ${Actions.name}#${key} from ${Actions.name}#${origin}` +
+            ' but direct access to another action is prohibitted.' +
+            ` Access it via this.dispatch('${key}') instead.`
+        )
+        actions[key].apply(actions, args)
+      }
+    })
+    return proxy
+  }
 
   traverseDescriptors(Actions.prototype, BaseActions, (desc, key) => {
     if (typeof desc.value !== 'function') {
       return
     }
 
-    options[key] = (_: any, payload: any) => (actions as any)[key](payload)
+    options[key] = (_: any, payload: any) => {
+      const proxy =
+        process.env.NODE_ENV === 'production'
+          ? actions
+          : proxyActions(actions, key)
+      return actions[key].call(proxy, payload)
+    }
   })
 
   return {

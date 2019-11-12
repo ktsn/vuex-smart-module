@@ -27,6 +27,10 @@ export function mapValues<T, R>(
   return res
 }
 
+export function error(message: string): void {
+  console.error(`[vuex-smart-module] ${message}`)
+}
+
 export function assert(condition: any, message: string): void {
   if (!condition) {
     throw new Error(`[vuex-smart-module] ${message}`)
