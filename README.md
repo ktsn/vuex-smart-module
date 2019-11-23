@@ -4,7 +4,7 @@ Type safe Vuex module with powerful module features. The basic API idea is broug
 
 ## Features
 
-- Completely type safe when use with TypeScript without redundancy.
+- Completely type safe when used with TypeScript without redundancy.
 - Provide a smart way to use modules.
 - Canonical Vuex-like API interface as possible.
 
@@ -112,7 +112,7 @@ export const store = createStore(
 )
 ```
 
-There created store is the same instance as Vuex store. Then you can use it as same manner as Vuex.
+The created store is a traditional instance of Vuex store - you can use it in the same manner.
 
 ```ts
 // main.ts
@@ -162,7 +162,7 @@ console.log(store.state.nested.value) // -> hello
 console.log(store.getters['nested/greeting']('John')) // -> hello, John
 ```
 
-Nested modules will be [namespaced module](https://vuex.vuejs.org/guide/modules.html#namespacing) by default. If you do not want a module to be a namespaced, pass `namespaced: false` option to module constructor options.
+Nested modules will be [namespaced module](https://vuex.vuejs.org/guide/modules.html#namespacing) by default. If you do not want a module to be a namespaced, pass the `namespaced: false` option to the module's constructor options.
 
 ```ts
 import { Getters, Module, createStore } from 'vuex-smart-module'
@@ -221,7 +221,7 @@ class FooActions extends Actions {
 }
 ```
 
-In case of you want to use another module in some module, you can create module context.
+In case of you want to use another module in some module, you can create a module context.
 
 ```ts
 import { Store } from 'vuex'
@@ -285,7 +285,7 @@ const store = createStore(root)
 
 ### Register Module Dynamically
 
-You can use `registerModule` to register a module and `unregisterModule` to unregister.
+You can use `registerModule` to register a module and `unregisterModule` to unregister it.
 
 ```ts
 import { registerModule, unregisterModule } from 'vuex-smart-module'
@@ -312,11 +312,11 @@ unregisterModule(
 )
 ```
 
-Note that the 3rd argument of `registerModule` which is namespace string must match with the actual namespace that the store resolves. If you pass wrong namespace to it, component mappers and context api would not work correctly.
+Note that the 3rd argument of `registerModule`, which is the namespace string, must match with the actual namespace that the store resolves. If you pass the wrong namespace to it, component mappers and context api would not work correctly.
 
 ### Component Mapper
 
-You can generate `mapXXX` helpers, which are the same interface as Vuex ones, for each associated module by using `createMapper` function. The mapped computed properties and methods are strictly typed. So you will not have some typo or pass wrong payload for them.
+You can generate `mapXXX` helpers, which are the same interface as Vuex ones, for each associated module by using the `createMapper` function. The mapped computed properties and methods are strictly typed. So you will not have some typo or pass wrong payloads to them.
 
 ```ts
 // @/store/modules/foo
@@ -353,9 +353,9 @@ export default Vue.extend({
 
 ### Method Style Access for Actions and Mutations
 
-`this` in an action and a module context have `actions` and `mutations` properties. They contains module actions and mutations in method form. You can use them instead of via `dispatch` or `commit` if you prefer method call style than event emitter style.
+`this` in an action and a module context have `actions` and `mutations` properties. They contains module actions and mutations in method form. You can use them instead of `dispatch` or `commit` if you prefer method call style over event emitter style.
 
-The method style has several advantages that you can use _Go to definition_ for your actions and mutations and it prints simple and easier to understand errors if you pass wrong payload type, for example.
+The method style has several advantages: you can use _Go to definition_ for your actions and mutations and it prints simple and easier to understand errors if you pass a wrong payload type, for example.
 
 Example usage in an action:
 
@@ -392,7 +392,7 @@ export default Vue.extend({
 
 ### Unit testing getters, mutations and actions
 
-vuex-smart-module provides `inject` helper function which allow you to inject mock dependencies into getters, mutations and actions instance. You can inject any properties for test:
+vuex-smart-module provides the `inject` helper function which allows you to inject mock dependencies into getters, mutations and actions instances. You can inject any properties for test:
 
 ```ts
 import { inject } from 'vuex-smart-module'
@@ -429,7 +429,7 @@ it('increments asynchronously', async () => {
 
 ### Mocking modules to test components
 
-When you want to mock some module assets, you can directly inject mock constructor into module options. For example, you will test the following component which is using `counter` module:
+When you want to mock some module assets, you can directly inject a mock constructor into the module options. For example, you will test the following component which is using the `counter` module:
 
 ```vue
 <template>
@@ -448,7 +448,7 @@ export default Vue.extend({
 </script>
 ```
 
-In the spec file, mock the `mutations` option in the `counter` module. The below is [Jest](https://jestjs.io/) example but the essential idea is the same:
+In the spec file, mock the `mutations` option in the `counter` module. The below is a [Jest](https://jestjs.io/) example but the essential idea holds true for many test frameworks:
 
 ```ts
 import * as Vuex from 'vuex'
