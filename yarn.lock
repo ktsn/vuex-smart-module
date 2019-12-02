@@ -4783,9 +4783,9 @@ testdouble@^3.12.4:
     theredoc "^1.0.0"
 
 testem@^3.0.0:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/testem/-/testem-3.0.1.tgz#93fbd93fd6a4dcd57bcd1ba506d22ed8f8cfcd21"
-  integrity sha512-2fgW8Zw+sbZDPxNdtGCH1qrzpFIG9nPdVAX/HlvBvishovOCIuRWrm/rz/FLiXp7NPOtB78Dj8QDQanoGk4+Ig==
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/testem/-/testem-3.0.2.tgz#9100d09e73c3271e5201a141dbd3f0d31e71add2"
+  integrity sha512-mUcPL7MZtmg3UUkOe6sIFXoY1ysv06qxQ7VEKnAHIAiKbf21DOdAJzVqR9YsOZcvennP9gKAUbL/607z9RQt/g==
   dependencies:
     backbone "^1.1.2"
     bluebird "^3.4.6"
