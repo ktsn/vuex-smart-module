@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
-    "@types/power-assert": "1.5.0",
+    "@types/power-assert": "1.5.2",
     "@vue/test-utils": "^1.0.0-beta.29",
     "eslint": "^6.0.1",
     "eslint-config-ktsn-typescript": "^2.0.0",
