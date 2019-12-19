@@ -6,7 +6,7 @@ Type safe Vuex module with powerful module features. The basic API idea is broug
 
 - Completely type safe when used with TypeScript without redundancy.
 - Provide a smart way to use modules.
-- Canonical Vuex-like API interface as possible.
+- Canonical Vuex-like API as possible.
 
 ## Installation
 
