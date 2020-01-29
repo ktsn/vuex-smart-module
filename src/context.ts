@@ -42,7 +42,7 @@ export interface Dispatch<A> {
   // no payload (only actions without parameters)
   <K extends { [K in keyof A]: A[K] extends () => any ? K : never }[keyof A]>(
     type: K
-  ): void
+  ): Promise<any>
 }
 
 type State<Mod extends Module<any, any, any, any>> = Mod extends Module<
