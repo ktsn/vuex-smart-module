@@ -218,7 +218,7 @@ export class Context<Mod extends Module<any, any, any, any>> {
 
   commit: Commit<Mutations<Mod>> = (
     type: any,
-    payload: any,
+    payload?: any,
     options?: any
   ): void => {
     return commit(this.store, this.pos.namespace, type, payload, options)
@@ -226,7 +226,7 @@ export class Context<Mod extends Module<any, any, any, any>> {
 
   dispatch: Dispatch<Actions<Mod>> = (
     type: any,
-    payload: any,
+    payload?: any,
     options?: any
   ): any => {
     return dispatch(this.store, this.pos.namespace, type, payload, options)
