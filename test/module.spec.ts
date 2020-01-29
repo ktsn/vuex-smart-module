@@ -836,7 +836,7 @@ describe('Module', () => {
     })
 
     describe('state', () => {
-      it('maps state', () => {
+      it('maps state', async () => {
         const Test = Vue.extend({
           computed: foo.mapState(['value']),
 
@@ -852,10 +852,11 @@ describe('Module', () => {
 
         assert(wrapper.text() === '1')
         store.state.foo.value = 2
+        await Vue.nextTick()
         assert(wrapper.text() === '2')
       })
 
-      it('maps state with object syntax', () => {
+      it('maps state with object syntax', async () => {
         const Test = Vue.extend({
           computed: foo.mapState({
             test: 'value'
@@ -873,10 +874,11 @@ describe('Module', () => {
 
         assert(wrapper.text() === '1')
         store.state.foo.value = 2
+        await Vue.nextTick()
         assert(wrapper.text() === '2')
       })
 
-      it('maps state with mapper function', () => {
+      it('maps state with mapper function', async () => {
         const Test = Vue.extend({
           computed: foo.mapState({
             value: (state, getters) => {
@@ -896,12 +898,13 @@ describe('Module', () => {
 
         assert(wrapper.text() === '3')
         store.state.foo.value = 2
+        await Vue.nextTick()
         assert(wrapper.text() === '6')
       })
     })
 
     describe('getters', () => {
-      it('maps getters', () => {
+      it('maps getters', async () => {
         const Test = Vue.extend({
           computed: foo.mapGetters(['double']),
 
@@ -917,10 +920,11 @@ describe('Module', () => {
 
         assert(wrapper.text() === '2')
         store.state.foo.value = 2
+        await Vue.nextTick()
         assert(wrapper.text() === '4')
       })
 
-      it('maps getters with object syntax', () => {
+      it('maps getters with object syntax', async () => {
         const Test = Vue.extend({
           computed: foo.mapGetters({
             test: 'double'
@@ -938,6 +942,7 @@ describe('Module', () => {
 
         assert(wrapper.text() === '2')
         store.state.foo.value = 2
+        await Vue.nextTick()
         assert(wrapper.text() === '4')
       })
     })
