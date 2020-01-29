@@ -54,3 +54,25 @@ export function canDeclareRecursiveModuleType() {
     }
   })
 }
+
+export function canDispatchOrCommitWithoutPayload() {
+  class TestMutations extends Mutations {
+    test() {}
+  }
+
+  class TestActions extends Actions<{}, Getters, TestMutations> {
+    test() {}
+  }
+
+  const test = new Module({
+    mutations: TestMutations,
+    actions: TestActions
+  })
+
+  const store = createStore(test)
+
+  const ctx = test.context(store)
+
+  ctx.dispatch('test')
+  ctx.commit('test')
+}
