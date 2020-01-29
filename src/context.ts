@@ -10,27 +10,39 @@ import { get, Class, gatherHandlerNames, assert } from './utils'
 import { Module } from './module'
 
 export interface Commit<M> {
+  // type and payload separate
   <K extends keyof M>(
     type: K,
     payload: Payload<M[K]>,
     options?: CommitOptions
   ): void
+  // type part of payload
   <K extends keyof M>(
     payload: Payload<M[K]> & { type: K },
     options?: CommitOptions
   ): void
+  // no payload (only mutations without parameters)
+  <K extends { [K in keyof M]: M[K] extends () => any ? K : never }[keyof M]>(
+    type: K
+  ): void
 }
 
 export interface Dispatch<A> {
+  // type and payload separate
   <K extends keyof A>(
     type: K,
     payload: Payload<A[K]>,
     options?: DispatchOptions
   ): Promise<any>
+  // type part of payload
   <K extends keyof A>(
     payload: Payload<A[K]> & { type: K },
     options?: DispatchOptions
   ): Promise<any>
+  // no payload (only actions without parameters)
+  <K extends { [K in keyof A]: A[K] extends () => any ? K : never }[keyof A]>(
+    type: K
+  ): void
 }
 
 type State<Mod extends Module<any, any, any, any>> = Mod extends Module<
