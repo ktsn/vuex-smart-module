@@ -496,6 +496,67 @@ it('calls increment mutation', () => {
 })
 ```
 
+### Mocking nested modules and dependencies
+
+Using dependencies and nested module contexts in Actions requires to mock them in tests.
+
+So you test the following Actions class that has been constructed as described in the section above:
+
+```ts
+import { Store } from 'vuex'
+import { Actions } from 'vuex-smart-module'
+
+class FooActions extends Actions {
+  // Declare dependency type
+  private store!: Store<FooState>
+  private bar!: Context<typeof bar>
+
+  // Called after the module is initialized
+  $init(store: Store<FooState>): void {
+    // Retain store instance for later
+    this.store = store
+    this.bar = bar.context(store)
+  }
+
+  async fetch(): Promise<void> {
+    console.log(await this.store.$axios.$get('...'))
+    this.bar.dispatch(...)
+  }
+}
+```
+
+Then the Jest spec file would be written as:
+
+```ts
+import { inject } from 'vuex-smart-module'
+import { FooActions } from '@/store/modules/foo'
+
+describe('FooActions', () => {
+  it('calls the dependency and dispatches the remote action', async () => {
+    const actions = inject(FooActions, {})
+    const axiosGet = jest.fn()
+    const barDispatch = jest.fn()
+
+    // @ts-ignore
+    actions.store = {
+      $axios: {
+        $get: axiosGet
+      }
+    }
+
+    // @ts-ignore
+    actions.bar = {
+      dispatch: barDispatch
+    }
+
+    await actions.fetch()
+
+    expect(axiosGet).toHaveBeenCalledWith(...)
+    expect(barDispatch).toHaveBeenCalledWith(...)
+  })
+})
+```
+
 ## License
 
 MIT
