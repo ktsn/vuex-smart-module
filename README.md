@@ -73,6 +73,7 @@ class FooActions extends Actions<
     return new Promise(resolve => {
       setTimeout(() => {
         this.commit('increment', payload.amount)
+        resolve()
       }, payload.interval)
     })
   }
