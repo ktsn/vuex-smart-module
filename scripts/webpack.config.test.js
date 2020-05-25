@@ -5,10 +5,10 @@ module.exports = {
   entry: glob.sync(path.resolve(__dirname, '../test/**/*.spec.ts')),
   output: {
     path: path.resolve(__dirname, '../.tmp'),
-    filename: 'test.js'
+    filename: 'test.js',
   },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js'],
   },
   module: {
     rules: [
@@ -18,20 +18,20 @@ module.exports = {
           {
             loader: 'ts-loader',
             options: {
-              transpileOnly: true
-            }
-          }
-        ]
+              transpileOnly: true,
+            },
+          },
+        ],
       },
 
       {
         enforce: 'post',
         test: /\.ts$/,
         include: [path.resolve(__dirname, '../test')],
-        use: ['webpack-espower-loader']
-      }
-    ]
+        use: ['webpack-espower-loader'],
+      },
+    ],
   },
   mode: 'development',
-  devtool: 'module-eval-source-map'
+  devtool: 'module-eval-source-map',
 }

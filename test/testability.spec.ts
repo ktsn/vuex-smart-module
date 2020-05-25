@@ -35,7 +35,7 @@ const test = new Module({
   state: TestState,
   getters: TestGetters,
   mutations: TestMutations,
-  actions: TestActions
+  actions: TestActions,
 })
 
 const localVue = createLocalVue()
@@ -47,7 +47,7 @@ describe('testability', () => {
     test.options.mutations = originalMutations
   })
 
-  it('can mock module options', done => {
+  it('can mock module options', (done) => {
     class MockMutations extends TestMutations {
       inc() {
         done()
@@ -63,29 +63,29 @@ describe('testability', () => {
   it('tests getters', () => {
     const getters = inject(TestGetters, {
       state: {
-        count: 5
-      }
+        count: 5,
+      },
     })
     assert(getters.double === 10)
   })
 
   it('tests mutations', () => {
     const state = {
-      count: 10
+      count: 10,
     }
     const mutations = inject(TestMutations, {
-      state
+      state,
     })
     mutations.inc()
     assert(state.count === 11)
   })
 
-  it('tests actions', done => {
+  it('tests actions', (done) => {
     const actions = inject(TestActions, {
       commit(type: string) {
         assert(type === 'inc')
         done()
-      }
+      },
     })
     actions.inc()
   })

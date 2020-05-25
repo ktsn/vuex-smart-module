@@ -4,7 +4,7 @@ import {
   Mutations as BaseMutations,
   Actions as BaseActions,
   Dispatcher,
-  Committer
+  Committer,
 } from './assets'
 import { get, Class, gatherHandlerNames, assert } from './utils'
 import { Module } from './module'
@@ -101,7 +101,7 @@ export function createLazyContextPosition(
     get namespace() {
       assert(module.namespace !== undefined, message)
       return module.namespace!
-    }
+    },
   }
 }
 
@@ -118,7 +118,7 @@ function normalizedDispatch(
     return dispatch(
       {
         ...type,
-        type: namespace + type.type
+        type: namespace + type.type,
       },
       payload
     )
@@ -149,7 +149,7 @@ export function getters(store: Store<any>, namespace: string): any {
   const sliceIndex = namespace.length
   const getters: Record<string, any> = {}
 
-  Object.keys(store.getters).forEach(key => {
+  Object.keys(store.getters).forEach((key) => {
     const sameNamespace = namespace === key.slice(0, sliceIndex)
     const name = key.slice(sliceIndex)
     if (!sameNamespace || !name) {
@@ -158,7 +158,7 @@ export function getters(store: Store<any>, namespace: string): any {
 
     Object.defineProperty(getters, name, {
       get: () => store.getters[key],
-      enumerable: true
+      enumerable: true,
     })
   })
 
@@ -186,10 +186,10 @@ export class Context<Mod extends Module<any, any, any, any>> {
         this.mutationsClass.prototype,
         BaseMutations
       )
-      mutationNames.forEach(name => {
+      mutationNames.forEach((name) => {
         Object.defineProperty(mutations, name, {
           value: (payload: any) => this.commit(name, payload),
-          enumerable: true
+          enumerable: true,
         })
       })
     }
@@ -206,10 +206,10 @@ export class Context<Mod extends Module<any, any, any, any>> {
         this.actionsClass.prototype,
         BaseActions
       )
-      actionNames.forEach(name => {
+      actionNames.forEach((name) => {
         Object.defineProperty(actions, name, {
           value: (payload: any) => this.dispatch(name, payload),
-          enumerable: true
+          enumerable: true,
         })
       })
     }

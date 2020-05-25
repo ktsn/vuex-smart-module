@@ -5,8 +5,8 @@ export interface Class<T> {
 export const noop = () => {}
 
 export function combine<T>(...fs: ((x: T) => void)[]): (x: T) => void {
-  return x => {
-    fs.forEach(f => f(x))
+  return (x) => {
+    fs.forEach((f) => f(x))
   }
 }
 
@@ -21,7 +21,7 @@ export function mapValues<T, R>(
   fn: (value: T, key: string) => R
 ): Record<string, R> {
   const res: Record<string, R> = {}
-  Object.keys(record).forEach(key => {
+  Object.keys(record).forEach((key) => {
     res[key] = fn(record[key], key)
   })
   return res
@@ -51,7 +51,7 @@ export function traverseDescriptors(
     return
   }
 
-  Object.getOwnPropertyNames(proto).forEach(key => {
+  Object.getOwnPropertyNames(proto).forEach((key) => {
     // Ensure to only choose most extended properties
     if (exclude[key]) return
     exclude[key] = true

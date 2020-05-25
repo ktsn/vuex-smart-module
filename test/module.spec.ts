@@ -13,7 +13,7 @@ import {
   Actions,
   Module,
   Context,
-  createMapper
+  createMapper,
 } from '../src'
 
 const localVue = createLocalVue()
@@ -46,7 +46,7 @@ describe('Module', () => {
     FooActions
   > {
     inc() {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           this.commit('inc', undefined)
           resolve()
@@ -54,7 +54,7 @@ describe('Module', () => {
       })
     }
     incBy(payload: { value: number }) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           this.mutations.incBy(payload)
           resolve()
@@ -74,7 +74,7 @@ describe('Module', () => {
         state: FooState,
         getters: FooGetters,
         mutations: FooMutations,
-        actions: FooActions
+        actions: FooActions,
       })
 
       const store = createStore(m)
@@ -93,13 +93,13 @@ describe('Module', () => {
         state: FooState,
         getters: FooGetters,
         mutations: FooMutations,
-        actions: FooActions
+        actions: FooActions,
       })
 
       const root = new Module({
         modules: {
-          foo
-        }
+          foo,
+        },
       })
 
       const store = createStore(root)
@@ -119,13 +119,13 @@ describe('Module', () => {
         state: FooState,
         getters: FooGetters,
         mutations: FooMutations,
-        actions: FooActions
+        actions: FooActions,
       })
 
       const root = new Module({
         modules: {
-          foo
-        }
+          foo,
+        },
       })
 
       const store = createStore(root)
@@ -142,7 +142,7 @@ describe('Module', () => {
     it('handles complex namespace', () => {
       const baz = new Module({
         state: FooState,
-        mutations: FooMutations
+        mutations: FooMutations,
       })
 
       const bar = new Module({
@@ -150,22 +150,22 @@ describe('Module', () => {
         state: FooState,
         mutations: FooMutations,
         modules: {
-          baz
-        }
+          baz,
+        },
       })
 
       const foo = new Module({
         state: FooState,
         mutations: FooMutations,
         modules: {
-          bar
-        }
+          bar,
+        },
       })
 
       const root = new Module({
         modules: {
-          foo
-        }
+          foo,
+        },
       })
 
       const store = createStore(root)
@@ -190,7 +190,7 @@ describe('Module', () => {
     it('has state reference', () => {
       const root = new Module({
         state: FooState,
-        getters: FooGetters
+        getters: FooGetters,
       })
 
       const store = createStore(root)
@@ -211,7 +211,7 @@ describe('Module', () => {
 
       const root = new Module({
         state: FooState,
-        getters: TestGetters
+        getters: TestGetters,
       })
 
       const store = createStore(root)
@@ -228,7 +228,7 @@ describe('Module', () => {
 
       const root = new Module({
         state: FooState,
-        getters: TestGetters
+        getters: TestGetters,
       })
 
       const store = createStore(root)
@@ -236,7 +236,7 @@ describe('Module', () => {
       assert(store.getters.add(5) === 6)
     })
 
-    it('calls $init hook', done => {
+    it('calls $init hook', (done) => {
       class TestGetters extends Getters {
         $init(store: Vuex.Store<any>): void {
           assert(store instanceof Vuex.Store)
@@ -245,7 +245,7 @@ describe('Module', () => {
       }
 
       const root = new Module({
-        getters: TestGetters
+        getters: TestGetters,
       })
 
       createStore(root)
@@ -265,7 +265,7 @@ describe('Module', () => {
       }
 
       const root = new Module({
-        getters: ChildGetters
+        getters: ChildGetters,
       })
 
       const store = createStore(root)
@@ -288,7 +288,7 @@ describe('Module', () => {
       console.error = td.function() as any
 
       const root = new Module({
-        getters: TestGetters
+        getters: TestGetters,
       })
       const store = createStore(root)
 
@@ -315,7 +315,7 @@ describe('Module', () => {
       console.error = td.function() as any
 
       const root = new Module({
-        getters: TestGetters
+        getters: TestGetters,
       })
       const store = createStore(root)
 
@@ -333,7 +333,7 @@ describe('Module', () => {
     it('has state reference', () => {
       const root = new Module({
         state: FooState,
-        mutations: FooMutations
+        mutations: FooMutations,
       })
 
       const store = createStore(root)
@@ -356,7 +356,7 @@ describe('Module', () => {
 
       const root = new Module({
         state: FooState,
-        mutations: ChildMutations
+        mutations: ChildMutations,
       })
 
       const store = createStore(root)
@@ -375,7 +375,7 @@ describe('Module', () => {
       }
 
       const root = new Module({
-        mutations: TestMutations
+        mutations: TestMutations,
       })
 
       const store = createStore(root)
@@ -393,7 +393,7 @@ describe('Module', () => {
   })
 
   describe('actions', () => {
-    it('has state reference', done => {
+    it('has state reference', (done) => {
       class TestActions extends Actions<FooState> {
         test(): void {
           assert(this.state.value === 1)
@@ -403,14 +403,14 @@ describe('Module', () => {
 
       const root = new Module({
         state: FooState,
-        actions: TestActions
+        actions: TestActions,
       })
 
       const store = createStore(root)
       store.dispatch('test')
     })
 
-    it('has getters reference', done => {
+    it('has getters reference', (done) => {
       class TestActions extends Actions<FooState, FooGetters> {
         test(): void {
           assert(this.getters.double === 2)
@@ -421,7 +421,7 @@ describe('Module', () => {
       const root = new Module({
         state: FooState,
         getters: FooGetters,
-        actions: TestActions
+        actions: TestActions,
       })
 
       const store = createStore(root)
@@ -432,7 +432,7 @@ describe('Module', () => {
       const root = new Module({
         state: FooState,
         mutations: FooMutations,
-        actions: FooActions
+        actions: FooActions,
       })
 
       const store = createStore(root)
@@ -440,7 +440,7 @@ describe('Module', () => {
       assert(store.state.value === 2)
     })
 
-    it('has dispatch reference', done => {
+    it('has dispatch reference', (done) => {
       class TestActions extends Actions<{}, Getters, Mutations, TestActions> {
         one(): void {
           this.dispatch('two', undefined)
@@ -452,14 +452,14 @@ describe('Module', () => {
       }
 
       const root = new Module({
-        actions: TestActions
+        actions: TestActions,
       })
 
       const store = createStore(root)
       store.dispatch('one')
     })
 
-    it('calls $init hook', done => {
+    it('calls $init hook', (done) => {
       class TestActions extends Actions {
         $init(store: Vuex.Store<any>): void {
           assert(store instanceof Vuex.Store)
@@ -468,7 +468,7 @@ describe('Module', () => {
       }
 
       const root = new Module({
-        actions: TestActions
+        actions: TestActions,
       })
 
       createStore(root)
@@ -493,7 +493,7 @@ describe('Module', () => {
       const root = new Module({
         state: FooState,
         mutations: FooMutations,
-        actions: ChildActions
+        actions: ChildActions,
       })
 
       const store = createStore(root)
@@ -512,7 +512,7 @@ describe('Module', () => {
       }
 
       const root = new Module({
-        actions: TestActions
+        actions: TestActions,
       })
 
       const store = createStore(root)
@@ -536,7 +536,7 @@ describe('Module', () => {
         TestActions
       > {
         inc(): Promise<void> {
-          return new Promise(resolve => {
+          return new Promise((resolve) => {
             setTimeout(() => {
               this.mutations.inc()
               resolve()
@@ -544,7 +544,7 @@ describe('Module', () => {
           })
         }
         incBy(payload: { value: number }): Promise<void> {
-          return new Promise(resolve => {
+          return new Promise((resolve) => {
             setTimeout(() => {
               this.mutations.incBy(payload)
               resolve()
@@ -562,7 +562,7 @@ describe('Module', () => {
         const root = new Module({
           state: FooState,
           mutations: FooMutations,
-          actions: TestActions
+          actions: TestActions,
         })
         const store = createStore(root)
         await store.dispatch('inc')
@@ -573,7 +573,7 @@ describe('Module', () => {
         const root = new Module({
           state: FooState,
           mutations: FooMutations,
-          actions: TestActions
+          actions: TestActions,
         })
         const store = createStore(root)
         await store.dispatch('one')
@@ -584,7 +584,7 @@ describe('Module', () => {
         const root = new Module({
           state: FooState,
           mutations: FooMutations,
-          actions: TestActions
+          actions: TestActions,
         })
         const store = createStore(root)
         await store.dispatch('incBy', { value: 2 })
@@ -595,7 +595,7 @@ describe('Module', () => {
         const root = new Module({
           state: FooState,
           mutations: FooMutations,
-          actions: TestActions
+          actions: TestActions,
         })
         const store = createStore(root)
         await store.dispatch('incByTwo')
@@ -621,7 +621,7 @@ describe('Module', () => {
         const root = new Module({
           state: FooState,
           mutations: FooMutations,
-          actions: ChildActions
+          actions: ChildActions,
         })
 
         const store = createStore(root)
@@ -639,13 +639,13 @@ describe('Module', () => {
         state: FooState,
         getters: FooGetters,
         mutations: FooMutations,
-        actions: FooActions
+        actions: FooActions,
       })
 
       const root = new Module({
         modules: {
-          foo
-        }
+          foo,
+        },
       })
 
       const store = createStore(root)
@@ -666,7 +666,7 @@ describe('Module', () => {
         state: FooState,
         getters: FooGetters,
         mutations: FooMutations,
-        actions: FooActions
+        actions: FooActions,
       })
 
       class TestGetters extends Getters {
@@ -682,14 +682,14 @@ describe('Module', () => {
       }
 
       const test = new Module({
-        getters: TestGetters
+        getters: TestGetters,
       })
 
       const root = new Module({
         modules: {
           test,
-          foo
-        }
+          foo,
+        },
       })
 
       const store = createStore(root)
@@ -703,7 +703,7 @@ describe('Module', () => {
           state: FooState,
           getters: FooGetters,
           mutations: FooMutations,
-          actions: FooActions
+          actions: FooActions,
         })
 
         class TestActions extends Actions {
@@ -719,14 +719,14 @@ describe('Module', () => {
         }
 
         const test = new Module({
-          actions: TestActions
+          actions: TestActions,
         })
 
         const root = new Module({
           modules: {
             test,
-            foo
-          }
+            foo,
+          },
         })
 
         const store = createStore(root)
@@ -754,20 +754,20 @@ describe('Module', () => {
       }
 
       const foo = new Module({
-        getters: FooGetters
+        getters: FooGetters,
       })
 
       const bar = new Module({
         namespaced: false,
-        getters: BarGetters
+        getters: BarGetters,
       })
 
       const store = createStore(
         new Module({
           modules: {
             foo,
-            bar
-          }
+            bar,
+          },
         })
       )
 
@@ -780,7 +780,7 @@ describe('Module', () => {
       state: FooState,
       getters: FooGetters,
       mutations: FooMutations,
-      actions: FooActions
+      actions: FooActions,
     })
 
     class TestActions extends Actions {
@@ -797,14 +797,14 @@ describe('Module', () => {
     }
 
     const test = new Module({
-      actions: TestActions
+      actions: TestActions,
     })
 
     const root = new Module({
       modules: {
         test,
-        foo
-      }
+        foo,
+      },
     })
 
     const store = createStore(root)
@@ -818,13 +818,13 @@ describe('Module', () => {
       state: FooState,
       getters: FooGetters,
       mutations: FooMutations,
-      actions: FooActions
+      actions: FooActions,
     })
 
     const root = new Module({
       modules: {
-        foo: fooModule
-      }
+        foo: fooModule,
+      },
     })
 
     const foo = createMapper(fooModule)
@@ -842,12 +842,12 @@ describe('Module', () => {
 
           render(h): any {
             return h('div', [this.value.toString()])
-          }
+          },
         })
 
         const wrapper = shallowMount(Test, {
           localVue,
-          store
+          store,
         })
 
         assert(wrapper.text() === '1')
@@ -859,17 +859,17 @@ describe('Module', () => {
       it('maps state with object syntax', async () => {
         const Test = Vue.extend({
           computed: foo.mapState({
-            test: 'value'
+            test: 'value',
           }),
 
           render(h): any {
             return h('div', [this.test.toString()])
-          }
+          },
         })
 
         const wrapper = shallowMount(Test, {
           localVue,
-          store
+          store,
         })
 
         assert(wrapper.text() === '1')
@@ -883,17 +883,17 @@ describe('Module', () => {
           computed: foo.mapState({
             value: (state, getters) => {
               return state.value + getters.double
-            }
+            },
           }),
 
           render(h): any {
             return h('div', [this.value.toString()])
-          }
+          },
         })
 
         const wrapper = shallowMount(Test, {
           localVue,
-          store
+          store,
         })
 
         assert(wrapper.text() === '3')
@@ -910,12 +910,12 @@ describe('Module', () => {
 
           render(h): any {
             return h('div', [this.double.toString()])
-          }
+          },
         })
 
         const wrapper = shallowMount(Test, {
           localVue,
-          store
+          store,
         })
 
         assert(wrapper.text() === '2')
@@ -927,17 +927,17 @@ describe('Module', () => {
       it('maps getters with object syntax', async () => {
         const Test = Vue.extend({
           computed: foo.mapGetters({
-            test: 'double'
+            test: 'double',
           }),
 
           render(h): any {
             return h('div', [this.test.toString()])
-          }
+          },
         })
 
         const wrapper = shallowMount(Test, {
           localVue,
-          store
+          store,
         })
 
         assert(wrapper.text() === '2')
@@ -954,12 +954,12 @@ describe('Module', () => {
 
           render(h): any {
             return h('div')
-          }
+          },
         })
 
         const wrapper = shallowMount(Test, {
           localVue,
-          store
+          store,
         })
 
         const vm: InstanceType<typeof Test> = wrapper.vm
@@ -970,17 +970,17 @@ describe('Module', () => {
       it('maps mutations with object syntax', () => {
         const Test = Vue.extend({
           methods: foo.mapMutations({
-            increment: 'inc'
+            increment: 'inc',
           }),
 
           render(h): any {
             return h('div')
-          }
+          },
         })
 
         const wrapper = shallowMount(Test, {
           localVue,
-          store
+          store,
         })
 
         const vm: InstanceType<typeof Test> = wrapper.vm
@@ -996,17 +996,17 @@ describe('Module', () => {
                 commit('inc', undefined)
                 payload--
               }
-            }
+            },
           }),
 
           render(h): any {
             return h('div')
-          }
+          },
         })
 
         const wrapper = shallowMount(Test, {
           localVue,
-          store
+          store,
         })
 
         const vm: InstanceType<typeof Test> = wrapper.vm
@@ -1022,12 +1022,12 @@ describe('Module', () => {
 
           render(h): any {
             return h('div')
-          }
+          },
         })
 
         const wrapper = shallowMount(Test, {
           localVue,
-          store
+          store,
         })
 
         const vm: InstanceType<typeof Test> = wrapper.vm
@@ -1039,17 +1039,17 @@ describe('Module', () => {
       it('maps actions with object syntax', () => {
         const Test = Vue.extend({
           methods: foo.mapActions({
-            increment: 'inc'
+            increment: 'inc',
           }),
 
           render(h): any {
             return h('div')
-          }
+          },
         })
 
         const wrapper = shallowMount(Test, {
           localVue,
-          store
+          store,
         })
 
         const vm: InstanceType<typeof Test> = wrapper.vm
@@ -1068,17 +1068,17 @@ describe('Module', () => {
                 payload--
               }
               return Promise.all(p)
-            }
+            },
           }),
 
           render(h): any {
             return h('div')
-          }
+          },
         })
 
         const wrapper = shallowMount(Test, {
           localVue,
-          store
+          store,
         })
 
         const vm: InstanceType<typeof Test> = wrapper.vm

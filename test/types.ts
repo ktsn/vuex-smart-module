@@ -16,7 +16,7 @@ export function shouldInferUnionTypeContainsUndefined() {
 
   const test = new Module({
     mutations: TestMutations,
-    actions: TestActions
+    actions: TestActions,
   })
 
   const store = createStore(test)
@@ -38,7 +38,7 @@ export function canDeclareRecursiveModuleType() {
   }
 
   const child = new Module({
-    actions: ChildActions
+    actions: ChildActions,
   })
 
   class RootActions extends Actions<{}, never, never, RootActions> {
@@ -50,8 +50,8 @@ export function canDeclareRecursiveModuleType() {
   const root = new Module({
     actions: RootActions,
     modules: {
-      child
-    }
+      child,
+    },
   })
 }
 
@@ -66,7 +66,7 @@ export function canDispatchOrCommitWithoutPayload() {
 
   const test = new Module({
     mutations: TestMutations,
-    actions: TestActions
+    actions: TestActions,
   })
 
   const store = createStore(test)
