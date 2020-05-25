@@ -6,7 +6,7 @@ import {
   dispatch as namespacedDispatch,
   Commit,
   Dispatch,
-  createLazyContextPosition
+  createLazyContextPosition,
 } from './context'
 import { mapValues, get } from './utils'
 import { Module } from './module'
@@ -47,7 +47,7 @@ export class ComponentMapper<
   mapState(map: any): { [key: string]: () => any } {
     const pos = this.pos
 
-    return createMappedObject(map, value => {
+    return createMappedObject(map, (value) => {
       return function mappedStateComputed(this: Vue) {
         const state = get(pos.path, this.$store.state)
 
@@ -68,7 +68,7 @@ export class ComponentMapper<
   mapGetters(map: any): { [key: string]: () => any } {
     const pos = this.pos
 
-    return createMappedObject(map, value => {
+    return createMappedObject(map, (value) => {
       function mappedGetterComputed(this: Vue) {
         return this.$store.getters[pos.namespace + value]
       }
@@ -94,7 +94,7 @@ export class ComponentMapper<
   mapMutations(map: any): { [key: string]: (...args: any[]) => any } {
     const pos = this.pos
 
-    return createMappedObject(map, value => {
+    return createMappedObject(map, (value) => {
       return function mappedMutationMethod(this: Vue, ...args: any[]) {
         const commit = (type: any, payload: any) => {
           return namespacedCommit(this.$store, pos.namespace, type, payload)
@@ -121,7 +121,7 @@ export class ComponentMapper<
   mapActions(map: any): { [key: string]: (...args: any[]) => any } {
     const pos = this.pos
 
-    return createMappedObject(map, value => {
+    return createMappedObject(map, (value) => {
       return function mappedActionMethod(this: Vue, ...args: any[]) {
         const dispatch = (type: any, payload: any) => {
           return namespacedDispatch(this.$store, pos.namespace, type, payload)

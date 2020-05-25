@@ -6,7 +6,7 @@ import {
   Mutations,
   Actions,
   registerModule,
-  unregisterModule
+  unregisterModule,
 } from '../src'
 
 const localVue = createLocalVue()
@@ -27,7 +27,7 @@ let test: Module<TestState, never, TestMutations, any>
 beforeEach(() => {
   test = new Module({
     state: TestState,
-    mutations: TestMutations
+    mutations: TestMutations,
   })
 })
 
@@ -45,18 +45,18 @@ describe('registerModule', () => {
     const store = new Vuex.Store<any>({})
     store.replaceState({
       test: {
-        count: 10
-      }
+        count: 10,
+      },
     })
 
     registerModule(store, 'test', 'test', test, {
-      preserveState: true
+      preserveState: true,
     })
 
     assert(store.state.test.count === 10)
   })
 
-  it('calls $init hook', done => {
+  it('calls $init hook', (done) => {
     class FooActions extends Actions<{}, never, any, FooActions> {
       $init() {
         done()
@@ -64,7 +64,7 @@ describe('registerModule', () => {
     }
 
     const foo = new Module({
-      actions: FooActions
+      actions: FooActions,
     })
 
     const store = new Vuex.Store({})

@@ -3,7 +3,7 @@ import {
   Module as VuexModule,
   GetterTree,
   MutationTree,
-  ActionTree
+  ActionTree,
 } from 'vuex'
 import {
   Getters as BaseGetters,
@@ -11,7 +11,7 @@ import {
   Actions as BaseActions,
   BA,
   BG,
-  BM
+  BM,
 } from './assets'
 import {
   assert,
@@ -21,7 +21,7 @@ import {
   combine,
   traverseDescriptors,
   error,
-  deprecated
+  deprecated,
 } from './utils'
 import { Context, Commit, Dispatch, createLazyContextPosition } from './context'
 import { ComponentMapper, MappedFunction, RestArgs } from './mapper'
@@ -66,7 +66,7 @@ export class Module<
   clone(): Module<S, G, M, A> {
     const options = { ...this.options }
     if (options.modules) {
-      options.modules = mapValues(options.modules, m => m.clone())
+      options.modules = mapValues(options.modules, (m) => m.clone())
     }
     return new Module(options)
   }
@@ -152,7 +152,7 @@ export class Module<
       getters,
       mutations,
       actions,
-      modules
+      modules,
     } = this.options
 
     const children = !modules
@@ -177,7 +177,7 @@ export class Module<
           },
           {
             options: {} as Record<string, VuexModule<any, any>>,
-            injectStore: noop as (store: Store<any>) => void
+            injectStore: noop as (store: Store<any>) => void,
           }
         )
 
@@ -192,14 +192,14 @@ export class Module<
         getters: gettersInstance && gettersInstance.getters,
         mutations: mutationsInstance && mutationsInstance.mutations,
         actions: actionsInstance && actionsInstance.actions,
-        modules: children && children.options
+        modules: children && children.options,
       },
       injectStore: combine(
         children ? children.injectStore : noop,
         gettersInstance ? gettersInstance.injectStore : noop,
         mutationsInstance ? mutationsInstance.injectStore : noop,
         actionsInstance ? actionsInstance.injectStore : noop
-      )
+      ),
     }
   }
 }
@@ -219,7 +219,7 @@ function initGetters<
   // Proxy all getters to print useful warning on development
   function proxyGetters(getters: any, origin: string): any {
     const proxy = Object.create(getters)
-    Object.keys(options).forEach(key => {
+    Object.keys(options).forEach((key) => {
       Object.defineProperty(proxy, key, {
         get() {
           error(
@@ -229,7 +229,7 @@ function initGetters<
           )
           return getters[key]
         },
-        configurable: true
+        configurable: true,
       })
     })
     return proxy
@@ -261,15 +261,15 @@ function initGetters<
 
   return {
     getters: options,
-    injectStore: store => {
+    injectStore: (store) => {
       const context = module.context(store)
 
       Object.defineProperty(getters, '__ctx__', {
-        get: () => context
+        get: () => context,
       })
 
       getters.$init(store)
-    }
+    },
   }
 }
 
@@ -288,7 +288,7 @@ function initMutations<
   // Proxy all mutations to print useful warning on development
   function proxyMutations(mutations: any, origin: string): any {
     const proxy = Object.create(mutations)
-    Object.keys(options).forEach(key => {
+    Object.keys(options).forEach((key) => {
       proxy[key] = (...args: any[]) => {
         error(
           `You are accessing ${Mutations.name}#${key} from ${Mutations.name}#${origin}` +
@@ -318,12 +318,12 @@ function initMutations<
 
   return {
     mutations: options,
-    injectStore: store => {
+    injectStore: (store) => {
       const context = module.context(store)
       Object.defineProperty(mutations, '__ctx__', {
-        get: () => context
+        get: () => context,
       })
-    }
+    },
   }
 }
 
@@ -342,7 +342,7 @@ function initActions<
   // Proxy all actions to print useful warning on development
   function proxyActions(actions: any, origin: string): any {
     const proxy = Object.create(actions)
-    Object.keys(options).forEach(key => {
+    Object.keys(options).forEach((key) => {
       proxy[key] = (...args: any[]) => {
         error(
           `You are accessing ${Actions.name}#${key} from ${Actions.name}#${origin}` +
@@ -371,14 +371,14 @@ function initActions<
 
   return {
     actions: options,
-    injectStore: store => {
+    injectStore: (store) => {
       const context = module.context(store)
 
       Object.defineProperty(actions, '__ctx__', {
-        get: () => context
+        get: () => context,
       })
 
       actions.$init(store)
-    }
+    },
   }
 }

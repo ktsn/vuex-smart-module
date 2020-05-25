@@ -26,12 +26,12 @@ export function inject<T>(
   const proto = F.prototype
 
   const descs: PropertyDescriptorMap = {}
-  Object.keys(injection).forEach(key => {
+  Object.keys(injection).forEach((key) => {
     descs[key] = {
       configurable: true,
       enumerable: true,
       writable: true,
-      value: injection[key]
+      value: injection[key],
     }
   })
 
