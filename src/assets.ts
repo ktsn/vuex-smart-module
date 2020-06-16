@@ -40,7 +40,7 @@ export function inject<T>(
 
 export class Getters<S = {}> {
   /* @internal */
-  __ctx__!: Context<Module<S, this, any, any>>
+  __ctx__!: Context<Module<S, this, any, any, any>>
 
   $init(_store: Store<any>): void {}
 
@@ -55,7 +55,7 @@ export class Getters<S = {}> {
 
 export class Mutations<S = {}> {
   /* @internal */
-  __ctx__!: Context<Module<S, any, any, any>>
+  __ctx__!: Context<Module<S, any, any, any, any>>
 
   protected get state(): S {
     return this.__ctx__.state
@@ -66,10 +66,11 @@ export class Actions<
   S = {},
   G extends BG<S> = BG<S>,
   M extends BM<S> = BM<S>,
+  N extends NestedModules = NestedModules,
   A = {} // We need to specify self action type explicitly to infer dispatch type.
 > {
   /* @internal */
-  __ctx__!: Context<Module<S, G, M, any>>
+  __ctx__!: Context<Module<S, G, M, any, any>>
 
   $init(_store: Store<any>): void {}
 
@@ -102,6 +103,10 @@ export class Actions<
   protected get mutations(): Committer<M> {
     return this.__ctx__.mutations
   }
+
+  protected get modules(): N {
+    return (this.__ctx__.modules as unknown) as N
+  }
 }
 
 export type Committer<M> = {
@@ -126,3 +131,7 @@ export type Payload<T> = T extends (payload?: infer P) => any
   : T extends (payload: infer P) => any
   ? P
   : never
+
+export class NestedModules<N = Module<any, any, any, any, any>> {
+  [K: string]: N
+}

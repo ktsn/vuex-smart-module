@@ -12,11 +12,11 @@ import {
   BA,
   BG,
   BM,
+  NestedModules,
 } from './assets'
 import {
   assert,
   Class,
-  mapValues,
   noop,
   combine,
   traverseDescriptors,
@@ -30,14 +30,15 @@ export interface ModuleOptions<
   S,
   G extends BG<S>,
   M extends BM<S>,
-  A extends BA<S, G, M>
+  A extends BA<S, G, M>,
+  N extends NestedModules
 > {
   namespaced?: boolean
   state?: Class<S>
   getters?: Class<G>
   mutations?: Class<M>
   actions?: Class<A>
-  modules?: Record<string, Module<any, any, any, any>>
+  modules?: Class<N>
 }
 
 interface ModuleInstance {
@@ -49,7 +50,8 @@ export class Module<
   S,
   G extends BG<S>,
   M extends BM<S>,
-  A extends BA<S, G, M>
+  A extends BA<S, G, M>,
+  N extends NestedModules
 > {
   /* @internal */
   path: string[] | undefined
@@ -61,14 +63,12 @@ export class Module<
     createLazyContextPosition(this)
   )
 
-  constructor(public options: ModuleOptions<S, G, M, A> = {}) {}
+  modules?: N | undefined
 
-  clone(): Module<S, G, M, A> {
-    const options = { ...this.options }
-    if (options.modules) {
-      options.modules = mapValues(options.modules, (m) => m.clone())
-    }
-    return new Module(options)
+  constructor(public options: ModuleOptions<S, G, M, A, N> = {}) {}
+
+  clone(): Module<S, G, M, A, N> {
+    return new Module({ ...this.options })
   }
 
   context(store: Store<any>): Context<this> {
@@ -76,7 +76,8 @@ export class Module<
       createLazyContextPosition(this),
       store,
       this.options.mutations,
-      this.options.actions
+      this.options.actions,
+      this.modules
     )
   }
 
@@ -155,11 +156,12 @@ export class Module<
       modules,
     } = this.options
 
-    const children = !modules
+    this.modules = modules ? new modules() : undefined
+    const children = !this.modules
       ? undefined
-      : Object.keys(modules).reduce(
+      : Object.keys(this.modules).reduce(
           (acc, key) => {
-            const m = modules[key]
+            const m = this.modules![key]
             const nextNamespaced =
               m.options.namespaced === undefined ? true : m.options.namespaced
 
@@ -208,10 +210,11 @@ function initGetters<
   S,
   G extends BG<S>,
   M extends BM<S>,
-  A extends BA<S, G, M>
+  A extends BA<S, G, M>,
+  N extends NestedModules
 >(
   Getters: Class<G>,
-  module: Module<S, G, M, A>
+  module: Module<S, G, M, A, N>
 ): { getters: GetterTree<any, any>; injectStore: (store: Store<any>) => void } {
   const getters: any = new Getters()
   const options: GetterTree<any, any> = {}
@@ -277,10 +280,11 @@ function initMutations<
   S,
   G extends BG<S>,
   M extends BM<S>,
-  A extends BA<S, G, M>
+  A extends BA<S, G, M>,
+  N extends NestedModules
 >(
   Mutations: Class<M>,
-  module: Module<S, G, M, A>
+  module: Module<S, G, M, A, N>
 ): { mutations: MutationTree<any>; injectStore: (store: Store<any>) => void } {
   const mutations: any = new Mutations()
   const options: MutationTree<any> = {}
@@ -331,10 +335,11 @@ function initActions<
   S,
   G extends BG<S>,
   M extends BM<S>,
-  A extends BA<S, G, M>
+  A extends BA<S, G, M>,
+  N extends NestedModules
 >(
   Actions: Class<A>,
-  module: Module<S, G, M, A>
+  module: Module<S, G, M, A, N>
 ): { actions: ActionTree<any, any>; injectStore: (store: Store<any>) => void } {
   const actions: any = new Actions()
   const options: ActionTree<any, any> = {}

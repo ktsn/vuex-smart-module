@@ -5,6 +5,7 @@ import {
   Actions as BaseActions,
   Dispatcher,
   Committer,
+  NestedModules,
 } from './assets'
 import { get, Class, gatherHandlerNames, assert } from './utils'
 import { Module } from './module'
@@ -45,7 +46,18 @@ export interface Dispatch<A> {
   ): Promise<any>
 }
 
-type State<Mod extends Module<any, any, any, any>> = Mod extends Module<
+type State<Mod extends Module<any, any, any, any, any>> = Mod extends Module<
+  infer R,
+  any,
+  any,
+  any,
+  any
+>
+  ? R
+  : never
+
+type Getters<Mod extends Module<any, any, any, any, any>> = Mod extends Module<
+  any,
   infer R,
   any,
   any,
@@ -54,7 +66,8 @@ type State<Mod extends Module<any, any, any, any>> = Mod extends Module<
   ? R
   : never
 
-type Getters<Mod extends Module<any, any, any, any>> = Mod extends Module<
+type Mutations<Mod extends Module<any, any, any, any, any>> = Mod extends Module<
+  any,
   any,
   infer R,
   any,
@@ -63,20 +76,12 @@ type Getters<Mod extends Module<any, any, any, any>> = Mod extends Module<
   ? R
   : never
 
-type Mutations<Mod extends Module<any, any, any, any>> = Mod extends Module<
+type Actions<Mod extends Module<any, any, any, any, any>> = Mod extends Module<
+  any,
   any,
   any,
   infer R,
   any
->
-  ? R
-  : never
-
-type Actions<Mod extends Module<any, any, any, any>> = Mod extends Module<
-  any,
-  any,
-  any,
-  infer R
 >
   ? R
   : never
@@ -87,7 +92,7 @@ export interface ContextPosition {
 }
 
 export function createLazyContextPosition(
-  module: Module<any, any, any, any>
+  module: Module<any, any, any, any, any>
 ): ContextPosition {
   const message =
     'The module need to be registered a store before using `Module#context` or `createMapper`'
@@ -165,7 +170,7 @@ export function getters(store: Store<any>, namespace: string): any {
   return getters
 }
 
-export class Context<Mod extends Module<any, any, any, any>> {
+export class Context<Mod extends Module<any, any, any, any, any>> {
   private __mutations__?: Committer<Mutations<Mod>>
   private __actions__?: Dispatcher<Actions<Mod>>
   /** @internal */
@@ -173,7 +178,8 @@ export class Context<Mod extends Module<any, any, any, any>> {
     private pos: ContextPosition,
     private store: Store<any>,
     private mutationsClass: Class<unknown> | undefined,
-    private actionsClass: Class<unknown> | undefined
+    private actionsClass: Class<unknown> | undefined,
+    private nestedModules: NestedModules | undefined
   ) {}
 
   get mutations(): Committer<Mutations<Mod>> {
@@ -238,5 +244,9 @@ export class Context<Mod extends Module<any, any, any, any>> {
 
   get getters(): Getters<Mod> {
     return getters(this.store, this.pos.namespace)
+  }
+
+  get modules(): NestedModules | undefined {
+    return this.nestedModules
   }
 }

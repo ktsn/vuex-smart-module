@@ -10,7 +10,7 @@ import {
 } from './context'
 import { mapValues, get } from './utils'
 import { Module } from './module'
-import { BG, BM, BA, Payload } from './assets'
+import { BG, BM, BA, Payload, NestedModules } from './assets'
 
 export type MappedFunction<Fn, R> = undefined extends Payload<Fn>
   ? (payload?: Payload<Fn>) => R
@@ -24,8 +24,9 @@ export function createMapper<
   S,
   G extends BG<S>,
   M extends BM<S>,
-  A extends BA<S, G, M>
->(module: Module<S, G, M, A>): ComponentMapper<S, G, M, A> {
+  A extends BA<S, G, M>,
+  N extends NestedModules
+>(module: Module<S, G, M, A, N>): ComponentMapper<S, G, M, A> {
   return new ComponentMapper(createLazyContextPosition(module))
 }
 

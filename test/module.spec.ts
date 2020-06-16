@@ -14,6 +14,7 @@ import {
   Module,
   Context,
   createMapper,
+  NestedModules,
 } from '../src'
 
 const localVue = createLocalVue()
@@ -43,6 +44,7 @@ describe('Module', () => {
     FooState,
     FooGetters,
     FooMutations,
+    any,
     FooActions
   > {
     inc() {
@@ -96,10 +98,12 @@ describe('Module', () => {
         actions: FooActions,
       })
 
+      class RootModules extends NestedModules {
+        foo = foo
+      }
+
       const root = new Module({
-        modules: {
-          foo,
-        },
+        modules: RootModules,
       })
 
       const store = createStore(root)
@@ -122,10 +126,12 @@ describe('Module', () => {
         actions: FooActions,
       })
 
+      class RootModules extends NestedModules {
+        foo = foo
+      }
+
       const root = new Module({
-        modules: {
-          foo,
-        },
+        modules: RootModules,
       })
 
       const store = createStore(root)
@@ -145,27 +151,33 @@ describe('Module', () => {
         mutations: FooMutations,
       })
 
+      class BarModules extends NestedModules {
+        baz = baz
+      }
+
       const bar = new Module({
         namespaced: false,
         state: FooState,
         mutations: FooMutations,
-        modules: {
-          baz,
-        },
+        modules: BarModules,
       })
+
+      class FooModules extends NestedModules {
+        bar = bar
+      }
 
       const foo = new Module({
         state: FooState,
         mutations: FooMutations,
-        modules: {
-          bar,
-        },
+        modules: FooModules,
       })
 
+      class RootModules extends NestedModules {
+        foo = foo
+      }
+
       const root = new Module({
-        modules: {
-          foo,
-        },
+        modules: RootModules,
       })
 
       const store = createStore(root)
@@ -441,7 +453,7 @@ describe('Module', () => {
     })
 
     it('has dispatch reference', (done) => {
-      class TestActions extends Actions<{}, Getters, Mutations, TestActions> {
+      class TestActions extends Actions<{}, Getters, Mutations, NestedModules, TestActions> {
         one(): void {
           this.dispatch('two', undefined)
         }
@@ -476,8 +488,8 @@ describe('Module', () => {
 
     it('collects parent actions', () => {
       class ParentActions<
-        A extends Actions<FooState, never, FooMutations, A>
-      > extends Actions<FooState, never, FooMutations, A> {
+        A extends Actions<FooState, never, FooMutations, any, A>
+      > extends Actions<FooState, never, FooMutations, any, A> {
         inc() {
           this.commit('inc', undefined)
         }
@@ -533,6 +545,7 @@ describe('Module', () => {
         FooState,
         FooGetters,
         FooMutations,
+        any,
         TestActions
       > {
         inc(): Promise<void> {
@@ -605,7 +618,7 @@ describe('Module', () => {
       it('collects parent actions', () => {
         class ParentActions<
           A extends Actions<FooState, never, FooMutations, any>
-        > extends Actions<FooState, never, FooMutations, A> {
+        > extends Actions<FooState, never, FooMutations, any, A> {
           inc() {
             this.mutations.inc()
           }
@@ -642,10 +655,12 @@ describe('Module', () => {
         actions: FooActions,
       })
 
+      class RootModules extends NestedModules {
+        foo = foo
+      }
+
       const root = new Module({
-        modules: {
-          foo,
-        },
+        modules: RootModules,
       })
 
       const store = createStore(root)
@@ -685,11 +700,13 @@ describe('Module', () => {
         getters: TestGetters,
       })
 
+      class RootModules extends NestedModules {
+        test = test
+        foo = foo
+      }
+
       const root = new Module({
-        modules: {
-          test,
-          foo,
-        },
+        modules: RootModules,
       })
 
       const store = createStore(root)
@@ -722,11 +739,13 @@ describe('Module', () => {
           actions: TestActions,
         })
 
+        class RootModules extends NestedModules {
+          test = test
+          foo = foo
+        }
+
         const root = new Module({
-          modules: {
-            test,
-            foo,
-          },
+          modules: RootModules,
         })
 
         const store = createStore(root)
@@ -762,12 +781,14 @@ describe('Module', () => {
         getters: BarGetters,
       })
 
+      class RootModules extends NestedModules {
+        foo = foo
+        bar = bar
+      }
+
       const store = createStore(
         new Module({
-          modules: {
-            foo,
-            bar,
-          },
+          modules: RootModules,
         })
       )
 
@@ -800,11 +821,13 @@ describe('Module', () => {
       actions: TestActions,
     })
 
+    class RootModules extends NestedModules {
+      test = test
+      foo = foo
+    }
+
     const root = new Module({
-      modules: {
-        test,
-        foo,
-      },
+      modules: RootModules,
     })
 
     const store = createStore(root)
@@ -821,10 +844,12 @@ describe('Module', () => {
       actions: FooActions,
     })
 
+    class RootModules extends NestedModules {
+      foo = fooModule
+    }
+
     const root = new Module({
-      modules: {
-        foo: fooModule,
-      },
+      modules: RootModules,
     })
 
     const foo = createMapper(fooModule)
