@@ -30,14 +30,15 @@ export interface ModuleOptions<
   S,
   G extends BG<S>,
   M extends BM<S>,
-  A extends BA<S, G, M>
+  A extends BA<S, G, M>,
+  Modules extends Record<string, Module<any, any, any, any, any>> = {}
 > {
   namespaced?: boolean
   state?: Class<S>
   getters?: Class<G>
   mutations?: Class<M>
   actions?: Class<A>
-  modules?: Record<string, Module<any, any, any, any>>
+  modules?: Modules
 }
 
 interface ModuleInstance {
@@ -49,7 +50,8 @@ export class Module<
   S,
   G extends BG<S>,
   M extends BM<S>,
-  A extends BA<S, G, M>
+  A extends BA<S, G, M>,
+  Modules extends Record<string, Module<any, any, any, any, any>> = {}
 > {
   /* @internal */
   path: string[] | undefined
@@ -61,23 +63,18 @@ export class Module<
     createLazyContextPosition(this)
   )
 
-  constructor(public options: ModuleOptions<S, G, M, A> = {}) {}
+  constructor(public options: ModuleOptions<S, G, M, A, Modules> = {}) {}
 
-  clone(): Module<S, G, M, A> {
+  clone(): Module<S, G, M, A, Modules> {
     const options = { ...this.options }
     if (options.modules) {
-      options.modules = mapValues(options.modules, (m) => m.clone())
+      options.modules = mapValues(options.modules, (m) => m.clone()) as Modules
     }
     return new Module(options)
   }
 
   context(store: Store<any>): Context<this> {
-    return new Context(
-      createLazyContextPosition(this),
-      store,
-      this.options.mutations,
-      this.options.actions
-    )
+    return new Context(createLazyContextPosition(this), store, this.options)
   }
 
   mapState<K extends keyof S>(map: K[]): { [Key in K]: () => S[Key] }
@@ -214,7 +211,7 @@ export class Module<
 
 export function hotUpdate(
   store: Store<unknown>,
-  module: Module<any, any, any, any>
+  module: Module<any, any, any, any, any>
 ): void {
   const { options, injectStore } = module.create([], '')
   store.hotUpdate(options)
@@ -225,10 +222,11 @@ function initGetters<
   S,
   G extends BG<S>,
   M extends BM<S>,
-  A extends BA<S, G, M>
+  A extends BA<S, G, M>,
+  Modules extends Record<string, Module<any, any, any, any, any>>
 >(
   Getters: Class<G>,
-  module: Module<S, G, M, A>
+  module: Module<S, G, M, A, Modules>
 ): { getters: GetterTree<any, any>; injectStore: (store: Store<any>) => void } {
   const getters: any = new Getters()
   const options: GetterTree<any, any> = {}
@@ -294,10 +292,11 @@ function initMutations<
   S,
   G extends BG<S>,
   M extends BM<S>,
-  A extends BA<S, G, M>
+  A extends BA<S, G, M>,
+  Modules extends Record<string, Module<any, any, any, any, any>>
 >(
   Mutations: Class<M>,
-  module: Module<S, G, M, A>
+  module: Module<S, G, M, A, Modules>
 ): { mutations: MutationTree<any>; injectStore: (store: Store<any>) => void } {
   const mutations: any = new Mutations()
   const options: MutationTree<any> = {}
@@ -348,10 +347,11 @@ function initActions<
   S,
   G extends BG<S>,
   M extends BM<S>,
-  A extends BA<S, G, M>
+  A extends BA<S, G, M>,
+  Modules extends Record<string, Module<any, any, any, any, any>>
 >(
   Actions: Class<A>,
-  module: Module<S, G, M, A>
+  module: Module<S, G, M, A, Modules>
 ): { actions: ActionTree<any, any>; injectStore: (store: Store<any>) => void } {
   const actions: any = new Actions()
   const options: ActionTree<any, any> = {}

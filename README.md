@@ -282,6 +282,52 @@ const root = new Module({
 const store = createStore(root)
 ```
 
+### Nested Module Context
+
+When there are nested modules in your module, you can access them through a module context.
+
+Let's say you have three modules: counter, todo and root where the root module has former two modules as nested modules:
+
+```ts
+import { Module, createStore } from 'vuex-smart-module'
+
+// Counter module
+const counter = new Module({
+  // ...
+})
+
+// Todo module
+const todo = new Module({
+  // ...
+})
+
+// Root module
+const root = new Module({
+  modules: {
+    counter,
+    todo
+  }
+})
+
+export const store = createStore(root)
+```
+
+You can access counter and todo contexts through the root context by using `modules` property.
+
+```ts
+import { root, store } from './store'
+
+// Get root context
+const ctx = root.context(store)
+
+// You can access counter and todo context through `modules` as well
+const counterCtx = ctx.modules.counter
+const todoCtx = ctx.modules.todo
+
+counterCtx.dispatch('increment')
+todoCtx.dispatch('fetchTodos')
+```
+
 ### Register Module Dynamically
 
 You can use `registerModule` to register a module and `unregisterModule` to unregister it.

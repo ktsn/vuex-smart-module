@@ -25,7 +25,7 @@ export function createMapper<
   G extends BG<S>,
   M extends BM<S>,
   A extends BA<S, G, M>
->(module: Module<S, G, M, A>): ComponentMapper<S, G, M, A> {
+>(module: Module<S, G, M, A, any>): ComponentMapper<S, G, M, A> {
   return new ComponentMapper(createLazyContextPosition(module))
 }
 

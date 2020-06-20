@@ -22,7 +22,7 @@ class TestMutations extends Mutations<TestState> {
   }
 }
 
-let test: Module<TestState, never, TestMutations, any>
+let test: Module<TestState, never, TestMutations, any, any>
 
 beforeEach(() => {
   test = new Module({

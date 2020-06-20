@@ -9,7 +9,7 @@ export { hotUpdate } from './module'
 export { Module }
 
 export function createStore(
-  rootModule: Module<any, any, any, any>,
+  rootModule: Module<any, any, any, any, any>,
   options: StoreOptions<any> = {}
 ): Store<any> {
   const rootModuleOptions = rootModule.getStoreOptions()
