@@ -20,7 +20,8 @@
   },
   "files": [
     "dist",
-    "lib"
+    "lib",
+    "ts3.4"
   ],
   "homepage": "https://github.com/ktsn/vuex-smart-module",
   "bugs": "https://github.com/ktsn/vuex-smart-module/issues",
