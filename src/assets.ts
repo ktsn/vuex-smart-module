@@ -7,21 +7,29 @@ interface Class<T> {
   new (...args: any[]): T
 }
 
+type DeepPartial<T> = T extends Function
+  ? T
+  : T extends object
+  ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : T
+
 export function inject<G extends Getters<S>, S>(
   Getters: Class<G>,
-  injection: Partial<G & { state: S; getters: G }>
+  injection: DeepPartial<G & { state: S; getters: G }>
 ): G
 export function inject<M extends Mutations<S>, S>(
   Mutations: Class<M>,
-  injection: Partial<M & { state: S }>
+  injection: DeepPartial<M & { state: S }>
 ): M
 export function inject<A extends Actions<S, G, any, any>, S, G extends BG<S>>(
   Actions: Class<A>,
-  injection: Partial<A & { state: S; getters: G; dispatch: any; commit: any }>
+  injection: DeepPartial<
+    A & { state: S; getters: G; dispatch: any; commit: any }
+  >
 ): A
 export function inject<T>(
   F: Class<T>,
-  injection: Partial<T> & Record<string, any>
+  injection: DeepPartial<T> & Record<string, any>
 ): T {
   const proto = F.prototype
 

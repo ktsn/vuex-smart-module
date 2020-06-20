@@ -616,8 +616,8 @@ import { Actions } from 'vuex-smart-module'
 
 class FooActions extends Actions {
   // Declare dependency type
-  private store!: Store<FooState>
-  private bar!: Context<typeof bar>
+  store!: Store<FooState>
+  bar!: Context<typeof bar>
 
   // Called after the module is initialized
   $init(store: Store<FooState>): void {
@@ -641,21 +641,20 @@ import { FooActions } from '@/store/modules/foo'
 
 describe('FooActions', () => {
   it('calls the dependency and dispatches the remote action', async () => {
-    const actions = inject(FooActions, {})
     const axiosGet = jest.fn()
     const barDispatch = jest.fn()
 
-    // @ts-ignore
-    actions.store = {
-      $axios: {
-        $get: axiosGet
-      }
-    }
+    const actions = inject(FooActions, {
+      store: {
+        $axios: {
+          $get: axiosGet
+        }
+      },
 
-    // @ts-ignore
-    actions.bar = {
-      dispatch: barDispatch
-    }
+      bar: {
+        dispatch: barDispatch
+      }
+    })
 
     await actions.fetch()
 
