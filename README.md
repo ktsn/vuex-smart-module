@@ -14,8 +14,6 @@ Type safe Vuex module with powerful module features. The basic API idea is broug
 $ npm install vuex-smart-module
 ```
 
-TypeScript >= 3.6 is required.
-
 ## Usage
 
 **All examples are written in TypeScript**

@@ -15,6 +15,9 @@
   "main": "dist/vuex-smart-module.cjs.js",
   "module": "dist/vuex-smart-module.esm.js",
   "types": "lib/index.d.ts",
+  "typesVersions": {
+    "<3.6": { "*": ["ts3.4/*"] }
+  },
   "files": [
     "dist",
     "lib"
@@ -26,12 +29,13 @@
     "url": "https://github.com/ktsn/vuex-smart-module.git"
   },
   "scripts": {
-    "prepublishOnly": "npm run test && npm run clean && npm run build",
-    "clean": "rm -rf lib dist .tmp",
+    "prepublishOnly": "npm run test && npm run clean && npm run build && npm run downlevel-dts",
+    "clean": "rm -rf lib dist .tmp ts3.4",
     "dev": "run-p watch:test testem",
     "build": "npm run build:ts && npm run build:rollup",
     "build:ts": "tsc -p src",
     "build:rollup": "node scripts/build.js",
+    "downlevel-dts": "downlevel-dts . ts3.4",
     "watch:test": "webpack --watch --config scripts/webpack.config.test.js",
     "lint": "eslint --ext js,ts scripts src test",
     "lint:fix": "eslint --ext js,ts --fix scripts src test",
@@ -43,6 +47,7 @@
     "@types/mocha": "^7.0.1",
     "@types/power-assert": "1.5.3",
     "@vue/test-utils": "^1.0.0-beta.29",
+    "downlevel-dts": "^0.5.0",
     "eslint": "^7.3.0",
     "eslint-config-ktsn-typescript": "^2.0.0",
     "glob": "^7.1.4",
