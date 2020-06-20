@@ -6,8 +6,8 @@ import {
   Dispatcher,
   Committer,
 } from './assets'
-import { get, Class, gatherHandlerNames, assert } from './utils'
-import { Module } from './module'
+import { get, gatherHandlerNames, assert } from './utils'
+import { Module, ModuleOptions } from './module'
 
 export interface Commit<M> {
   // type and payload separate
@@ -45,7 +45,18 @@ export interface Dispatch<A> {
   ): Promise<any>
 }
 
-type State<Mod extends Module<any, any, any, any>> = Mod extends Module<
+type State<Mod extends Module<any, any, any, any, any>> = Mod extends Module<
+  infer R,
+  any,
+  any,
+  any,
+  any
+>
+  ? R
+  : never
+
+type Getters<Mod extends Module<any, any, any, any, any>> = Mod extends Module<
+  any,
   infer R,
   any,
   any,
@@ -54,16 +65,12 @@ type State<Mod extends Module<any, any, any, any>> = Mod extends Module<
   ? R
   : never
 
-type Getters<Mod extends Module<any, any, any, any>> = Mod extends Module<
-  any,
-  infer R,
-  any,
-  any
->
-  ? R
-  : never
+type Mutations<
+  Mod extends Module<any, any, any, any, any>
+> = Mod extends Module<any, any, infer R, any, any> ? R : never
 
-type Mutations<Mod extends Module<any, any, any, any>> = Mod extends Module<
+type Actions<Mod extends Module<any, any, any, any, any>> = Mod extends Module<
+  any,
   any,
   any,
   infer R,
@@ -72,13 +79,10 @@ type Mutations<Mod extends Module<any, any, any, any>> = Mod extends Module<
   ? R
   : never
 
-type Actions<Mod extends Module<any, any, any, any>> = Mod extends Module<
-  any,
-  any,
-  any,
-  infer R
->
-  ? R
+type ModulesContexts<
+  Mod extends Module<any, any, any, any, any>
+> = Mod extends Module<any, any, any, any, infer R>
+  ? { [K in keyof R]: Context<R[K]> }
   : never
 
 export interface ContextPosition {
@@ -87,7 +91,7 @@ export interface ContextPosition {
 }
 
 export function createLazyContextPosition(
-  module: Module<any, any, any, any>
+  module: Module<any, any, any, any, any>
 ): ContextPosition {
   const message =
     'The module need to be registered a store before using `Module#context` or `createMapper`'
@@ -165,15 +169,15 @@ export function getters(store: Store<any>, namespace: string): any {
   return getters
 }
 
-export class Context<Mod extends Module<any, any, any, any>> {
+export class Context<Mod extends Module<any, any, any, any, any>> {
   private __mutations__?: Committer<Mutations<Mod>>
   private __actions__?: Dispatcher<Actions<Mod>>
+
   /** @internal */
   constructor(
     private pos: ContextPosition,
     private store: Store<any>,
-    private mutationsClass: Class<unknown> | undefined,
-    private actionsClass: Class<unknown> | undefined
+    private moduleOptions: ModuleOptions<any, any, any, any, any>
   ) {}
 
   get mutations(): Committer<Mutations<Mod>> {
@@ -181,9 +185,11 @@ export class Context<Mod extends Module<any, any, any, any>> {
       return this.__mutations__
     }
     const mutations: Record<string, any> = {}
-    if (this.mutationsClass) {
+
+    const mutationsClass = this.moduleOptions.mutations
+    if (mutationsClass) {
       const mutationNames = gatherHandlerNames(
-        this.mutationsClass.prototype,
+        mutationsClass.prototype,
         BaseMutations
       )
       mutationNames.forEach((name) => {
@@ -201,9 +207,11 @@ export class Context<Mod extends Module<any, any, any, any>> {
       return this.__actions__
     }
     const actions: Record<string, any> = {}
-    if (this.actionsClass) {
+
+    const actionsClass = this.moduleOptions.actions
+    if (actionsClass) {
       const actionNames = gatherHandlerNames(
-        this.actionsClass.prototype,
+        actionsClass.prototype,
         BaseActions
       )
       actionNames.forEach((name) => {
@@ -238,5 +246,27 @@ export class Context<Mod extends Module<any, any, any, any>> {
 
   get getters(): Getters<Mod> {
     return getters(this.store, this.pos.namespace)
+  }
+
+  get modules(): ModulesContexts<Mod> {
+    const modules = {} as ModulesContexts<Mod>
+    const children = this.moduleOptions.modules
+    if (!children) {
+      return modules
+    }
+
+    Object.keys(children).forEach((key) => {
+      const child = children[key]
+      Object.defineProperty(modules, key, {
+        get: () => {
+          return new Context(
+            createLazyContextPosition(child),
+            this.store,
+            child
+          )
+        },
+      })
+    })
+    return modules
   }
 }

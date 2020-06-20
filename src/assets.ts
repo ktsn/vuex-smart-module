@@ -48,7 +48,7 @@ export function inject<T>(
 
 export class Getters<S = {}> {
   /* @internal */
-  __ctx__!: Context<Module<S, this, any, any>>
+  __ctx__!: Context<Module<S, this, any, any, any>>
 
   $init(_store: Store<any>): void {}
 
@@ -63,7 +63,7 @@ export class Getters<S = {}> {
 
 export class Mutations<S = {}> {
   /* @internal */
-  __ctx__!: Context<Module<S, any, any, any>>
+  __ctx__!: Context<Module<S, any, any, any, any>>
 
   protected get state(): S {
     return this.__ctx__.state
@@ -77,7 +77,7 @@ export class Actions<
   A = {} // We need to specify self action type explicitly to infer dispatch type.
 > {
   /* @internal */
-  __ctx__!: Context<Module<S, G, M, any>>
+  __ctx__!: Context<Module<S, G, M, any, any>>
 
   $init(_store: Store<any>): void {}
 
