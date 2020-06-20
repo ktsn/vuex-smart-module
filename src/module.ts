@@ -31,7 +31,7 @@ export interface ModuleOptions<
   G extends BG<S>,
   M extends BM<S>,
   A extends BA<S, G, M>,
-  Modules extends Record<string, Module<any, any, any, any, any>>
+  Modules extends Record<string, Module<any, any, any, any, any>> = {}
 > {
   namespaced?: boolean
   state?: Class<S>
@@ -51,7 +51,7 @@ export class Module<
   G extends BG<S>,
   M extends BM<S>,
   A extends BA<S, G, M>,
-  Modules extends Record<string, Module<any, any, any, any, any>>
+  Modules extends Record<string, Module<any, any, any, any, any>> = {}
 > {
   /* @internal */
   path: string[] | undefined
