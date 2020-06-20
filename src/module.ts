@@ -212,6 +212,15 @@ export class Module<
   }
 }
 
+export function hotUpdate(
+  store: Store<unknown>,
+  module: Module<any, any, any, any>
+): void {
+  const { options, injectStore } = module.create([], '')
+  store.hotUpdate(options)
+  injectStore(store)
+}
+
 function initGetters<
   S,
   G extends BG<S>,
