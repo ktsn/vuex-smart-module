@@ -389,6 +389,88 @@ export default Vue.extend({
 })
 ```
 
+### Using in Nuxt's Modules Mode
+
+You can use `Module#getStoreOptions()` method to use vuex-smart-module in [Nuxt's module mode](https://nuxtjs.org/guide/vuex-store).
+
+When you have a counter module like the below:
+
+```ts
+// store/counter.ts
+import { Getters, Actions, Mutations, Module } from 'vuex-smart-module'
+
+export class CounterState {
+  count = 0
+}
+
+export class CounterGetters extends Getters<CounterState> {
+  get double() {
+    return this.state.count * 2
+  }
+}
+
+export class CounterMutations extends Mutations<CounterState> {
+  inc() {
+    this.state.count++
+  }
+}
+
+export class CounterActions extends Actions<CounterState, CounterGetters, CounterMutations> {
+  inc() {
+    this.commit('inc')
+  }
+}
+
+export default new Module({
+  state: CounterState,
+  getters: CounterGetters,
+  mutations: CounterMutations,
+  actions: CounterActions
+})
+```
+
+Construct a vuex-smart-module root module and export the store options acquired with `getStoreOptions` in `store/index.ts`.
+Note that you have to register all nested modules through the root module:
+
+```ts
+// store/index.ts
+import { Module } from 'vuex-smart-module'
+import counter from './counter'
+
+const root = new Module({
+  modules: {
+    counter
+  }
+})
+
+export const {
+  state,
+  getters,
+  mutations,
+  actions,
+  modules,
+  plugins
+} = root.getStoreOptions()
+```
+
+If you want to extend a store option, you can manually modify it:
+
+```ts
+// store/index.ts
+const options = root.getStoreOptions()
+
+export const {
+  state,
+  getters,
+  mutations,
+  actions,
+  modules
+} = options
+
+// Add an extra plugin
+export const plugins = options.plugins.concat([otherPlugin])
+```
+
 ## Testing
 
 ### Unit testing getters, mutations and actions

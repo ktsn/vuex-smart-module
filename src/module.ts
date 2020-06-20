@@ -135,6 +135,14 @@ export class Module<
     return this.mapper.mapActions(map)
   }
 
+  getStoreOptions() {
+    const { options, injectStore } = this.create([], '')
+    return {
+      ...options,
+      plugins: [injectStore],
+    }
+  }
+
   /* @internal */
   create(path: string[], namespace: string): ModuleInstance {
     assert(
@@ -188,7 +196,7 @@ export class Module<
     return {
       options: {
         namespaced: namespaced === undefined ? true : namespaced,
-        state: state ? new state() : {},
+        state: () => (state ? new state() : {}),
         getters: gettersInstance && gettersInstance.getters,
         mutations: mutationsInstance && mutationsInstance.mutations,
         actions: actionsInstance && actionsInstance.actions,
