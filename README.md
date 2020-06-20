@@ -471,6 +471,33 @@ export const {
 export const plugins = options.plugins.concat([otherPlugin])
 ```
 
+### Hot Module Replacement
+
+To utilize [hot module replacement](https://webpack.js.org/concepts/hot-module-replacement/) for the store created with vuex-smart-module, we provide `hotUpdate` function.
+
+The below is an example how to use `hotUpdate` function:
+
+```ts
+import { createStore, hotUpdate } from 'vuex-smart-module'
+import root from './root'
+
+export const store = createStore(root)
+
+if (module.hot) {
+  // accept actions and mutations as hot modules
+  module.hot.accept(['./root'], () => {
+    // require the updated modules
+    // have to add .default here
+    const newRoot = require('./root').default
+
+    // swap in the new root module by using `hotUpdate` provided from vuex-smart-module.
+    hotUpdate(store, newRoot)
+  })
+}
+```
+
+Note that you cannot use `hotUpdate` under Vuex store instance. Use `hotUpdate` function imported from `vuex-smart-module`.
+
 ## Testing
 
 ### Unit testing getters, mutations and actions
