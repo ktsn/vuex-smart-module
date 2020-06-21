@@ -1,4 +1,3 @@
-import * as assert from 'power-assert'
 import { createStore, Getters, Mutations, Actions, Module } from '../src'
 
 describe('Nested modules', () => {
@@ -50,15 +49,15 @@ describe('Nested modules', () => {
     const ctx = root.context(store)
     const fooCtx = ctx.modules.foo
 
-    assert(fooCtx.state.value === 1)
-    assert(fooCtx.getters.double === 2)
+    expect(fooCtx.state.value).toBe(1)
+    expect(fooCtx.getters.double).toBe(2)
 
     fooCtx.commit('inc', 1)
-    assert(fooCtx.state.value === 2)
-    assert(fooCtx.getters.double === 4)
+    expect(fooCtx.state.value).toBe(2)
+    expect(fooCtx.getters.double).toBe(4)
 
     fooCtx.dispatch('inc', 2)
-    assert(fooCtx.state.value === 4)
-    assert(fooCtx.getters.double === 8)
+    expect(fooCtx.state.value).toBe(4)
+    expect(fooCtx.getters.double).toBe(8)
   })
 })

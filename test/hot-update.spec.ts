@@ -1,4 +1,3 @@
-import * as assert from 'power-assert'
 import {
   createStore,
   Module,
@@ -50,7 +49,7 @@ describe('hotUpdate', () => {
   })
 
   it('does not update state', () => {
-    assert(store.state.value === 1)
+    expect(store.state.value).toBe(1)
 
     class NewState {
       value = 100
@@ -65,11 +64,11 @@ describe('hotUpdate', () => {
 
     hotUpdate(store, newFoo)
 
-    assert(store.state.value === 1)
+    expect(store.state.value).toBe(1)
   })
 
   it('updates a getter', () => {
-    assert(store.getters.double === 2)
+    expect(store.getters.double).toBe(2)
 
     class NewGetters extends Getters<FooState> {
       get double() {
@@ -86,12 +85,12 @@ describe('hotUpdate', () => {
 
     hotUpdate(store, newFoo)
 
-    assert(store.getters.double === 20)
+    expect(store.getters.double).toBe(20)
   })
 
   it('updates a mutation', () => {
     store.commit('inc', 1)
-    assert(store.state.value === 2)
+    expect(store.state.value).toBe(2)
 
     class NewMutations extends Mutations<FooState> {
       inc(amount: number) {
@@ -109,12 +108,12 @@ describe('hotUpdate', () => {
     hotUpdate(store, newFoo)
 
     store.commit('inc', 1)
-    assert(store.state.value === 12)
+    expect(store.state.value).toBe(12)
   })
 
   it('updates an action', () => {
     store.dispatch('inc', 1)
-    assert(store.state.value === 2)
+    expect(store.state.value).toBe(2)
 
     class NewActions extends Actions<
       FooState,
@@ -137,6 +136,6 @@ describe('hotUpdate', () => {
     hotUpdate(store, newFoo)
 
     store.dispatch('inc', 1)
-    assert(store.state.value === 12)
+    expect(store.state.value).toBe(12)
   })
 })
