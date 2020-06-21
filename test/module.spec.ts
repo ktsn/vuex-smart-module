@@ -1,8 +1,3 @@
-// Compilation check
-import './types'
-
-import * as assert from 'power-assert'
-import * as td from 'testdouble'
 import Vue from 'vue'
 import * as Vuex from 'vuex'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
@@ -79,12 +74,12 @@ describe('Module', () => {
 
       const store = createStore(m)
 
-      assert(store.state.value === 1)
-      assert(store.getters.double === 2)
+      expect(store.state.value).toBe(1)
+      expect(store.getters.double).toBe(2)
       store.commit('inc')
-      assert(store.state.value === 2)
+      expect(store.state.value).toBe(2)
       return store.dispatch('inc').then(() => {
-        assert(store.state.value === 3)
+        expect(store.state.value).toBe(3)
       })
     })
 
@@ -104,12 +99,12 @@ describe('Module', () => {
 
       const store = createStore(root)
 
-      assert(store.state.foo.value === 1)
-      assert(store.getters['foo/double'] === 2)
+      expect(store.state.foo.value).toBe(1)
+      expect(store.getters['foo/double']).toBe(2)
       store.commit('foo/inc')
-      assert(store.state.foo.value === 2)
+      expect(store.state.foo.value).toBe(2)
       return store.dispatch('foo/inc').then(() => {
-        assert(store.state.foo.value === 3)
+        expect(store.state.foo.value).toBe(3)
       })
     })
 
@@ -130,12 +125,12 @@ describe('Module', () => {
 
       const store = createStore(root)
 
-      assert(store.state.foo.value === 1)
-      assert(store.getters.double === 2)
+      expect(store.state.foo.value).toBe(1)
+      expect(store.getters.double).toBe(2)
       store.commit('inc')
-      assert(store.state.foo.value === 2)
+      expect(store.state.foo.value).toBe(2)
       return store.dispatch('inc').then(() => {
-        assert(store.state.foo.value === 3)
+        expect(store.state.foo.value).toBe(3)
       })
     })
 
@@ -170,19 +165,19 @@ describe('Module', () => {
 
       const store = createStore(root)
 
-      assert(store.state.foo.value === 1)
-      assert(store.state.foo.bar.value === 1)
-      assert(store.state.foo.bar.baz.value === 1)
+      expect(store.state.foo.value).toBe(1)
+      expect(store.state.foo.bar.value).toBe(1)
+      expect(store.state.foo.bar.baz.value).toBe(1)
 
       store.commit('foo/inc')
-      assert(store.state.foo.value === 2)
-      assert(store.state.foo.bar.value === 2)
-      assert(store.state.foo.bar.baz.value === 1)
+      expect(store.state.foo.value).toBe(2)
+      expect(store.state.foo.bar.value).toBe(2)
+      expect(store.state.foo.bar.baz.value).toBe(1)
 
       store.commit('foo/baz/inc')
-      assert(store.state.foo.value === 2)
-      assert(store.state.foo.bar.value === 2)
-      assert(store.state.foo.bar.baz.value === 2)
+      expect(store.state.foo.value).toBe(2)
+      expect(store.state.foo.bar.value).toBe(2)
+      expect(store.state.foo.bar.baz.value).toBe(2)
     })
   })
 
@@ -195,7 +190,7 @@ describe('Module', () => {
 
       const store = createStore(root)
 
-      assert(store.getters.double === 2)
+      expect(store.getters.double).toBe(2)
     })
 
     it('has state and getters reference', () => {
@@ -216,7 +211,7 @@ describe('Module', () => {
 
       const store = createStore(root)
 
-      assert(store.getters.ten === 10)
+      expect(store.getters.ten).toBe(10)
     })
 
     it('can has method style getters', () => {
@@ -233,13 +228,13 @@ describe('Module', () => {
 
       const store = createStore(root)
 
-      assert(store.getters.add(5) === 6)
+      expect(store.getters.add(5)).toBe(6)
     })
 
     it('calls $init hook', (done) => {
       class TestGetters extends Getters {
         $init(store: Vuex.Store<any>): void {
-          assert(store instanceof Vuex.Store)
+          expect(store instanceof Vuex.Store).toBe(true)
           done()
         }
       }
@@ -270,8 +265,8 @@ describe('Module', () => {
 
       const store = createStore(root)
 
-      assert(store.getters.a === 1)
-      assert(store.getters.b === 2)
+      expect(store.getters.a).toBe(1)
+      expect(store.getters.b).toBe(2)
     })
 
     it('warns if accessing another getter directly (property)', () => {
@@ -285,19 +280,17 @@ describe('Module', () => {
         }
       }
 
-      console.error = td.function() as any
+      const spy = jest.spyOn(console, 'error').mockImplementation()
 
       const root = new Module({
         getters: TestGetters,
       })
       const store = createStore(root)
 
-      assert(store.getters.b === 'a')
-      td.verify(
-        console.error(
-          '[vuex-smart-module] You are accessing TestGetters#a from TestGetters#b but direct access to another getter is prohibitted.' +
-            ' Access it via this.getters.a instead.'
-        )
+      expect(store.getters.b).toBe('a')
+      expect(spy).toHaveBeenCalledWith(
+        '[vuex-smart-module] You are accessing TestGetters#a from TestGetters#b but direct access to another getter is prohibitted.' +
+          ' Access it via this.getters.a instead.'
       )
     })
 
@@ -312,19 +305,17 @@ describe('Module', () => {
         }
       }
 
-      console.error = td.function() as any
+      const spy = jest.spyOn(console, 'error').mockImplementation()
 
       const root = new Module({
         getters: TestGetters,
       })
       const store = createStore(root)
 
-      assert(store.getters.b() === 'a')
-      td.verify(
-        console.error(
-          '[vuex-smart-module] You are accessing TestGetters#a from TestGetters#b but direct access to another getter is prohibitted.' +
-            ' Access it via this.getters.a instead.'
-        )
+      expect(store.getters.b()).toBe('a')
+      expect(spy).toHaveBeenCalledWith(
+        '[vuex-smart-module] You are accessing TestGetters#a from TestGetters#b but direct access to another getter is prohibitted.' +
+          ' Access it via this.getters.a instead.'
       )
     })
   })
@@ -338,7 +329,7 @@ describe('Module', () => {
 
       const store = createStore(root)
       store.commit('inc')
-      assert(store.state.value === 2)
+      expect(store.state.value).toBe(2)
     })
 
     it('collects parent mutations', () => {
@@ -361,9 +352,9 @@ describe('Module', () => {
 
       const store = createStore(root)
       store.commit('inc')
-      assert(store.state.value === 2)
+      expect(store.state.value).toBe(2)
       store.commit('dec')
-      assert(store.state.value === 1)
+      expect(store.state.value).toBe(1)
     })
 
     it('warns if accessing another mutation', () => {
@@ -380,14 +371,12 @@ describe('Module', () => {
 
       const store = createStore(root)
 
-      console.error = td.function() as any
+      const spy = jest.spyOn(console, 'error').mockImplementation()
       store.commit('b')
 
-      td.verify(
-        console.error(
-          '[vuex-smart-module] You are accessing TestMutations#a from TestMutations#b but accessing another mutation is prohibitted.' +
-            ' Use an action to consolidate the mutation chain.'
-        )
+      expect(spy).toHaveBeenCalledWith(
+        '[vuex-smart-module] You are accessing TestMutations#a from TestMutations#b but accessing another mutation is prohibitted.' +
+          ' Use an action to consolidate the mutation chain.'
       )
     })
   })
@@ -396,7 +385,7 @@ describe('Module', () => {
     it('has state reference', (done) => {
       class TestActions extends Actions<FooState> {
         test(): void {
-          assert(this.state.value === 1)
+          expect(this.state.value).toBe(1)
           done()
         }
       }
@@ -413,7 +402,7 @@ describe('Module', () => {
     it('has getters reference', (done) => {
       class TestActions extends Actions<FooState, FooGetters> {
         test(): void {
-          assert(this.getters.double === 2)
+          expect(this.getters.double).toBe(2)
           done()
         }
       }
@@ -437,7 +426,7 @@ describe('Module', () => {
 
       const store = createStore(root)
       await store.dispatch('inc')
-      assert(store.state.value === 2)
+      expect(store.state.value).toBe(2)
     })
 
     it('has dispatch reference', (done) => {
@@ -462,7 +451,7 @@ describe('Module', () => {
     it('calls $init hook', (done) => {
       class TestActions extends Actions {
         $init(store: Vuex.Store<any>): void {
-          assert(store instanceof Vuex.Store)
+          expect(store instanceof Vuex.Store).toBe(true)
           done()
         }
       }
@@ -498,9 +487,9 @@ describe('Module', () => {
 
       const store = createStore(root)
       store.dispatch('inc')
-      assert(store.state.value === 2)
+      expect(store.state.value).toBe(2)
       store.dispatch('doubleInc')
-      assert(store.state.value === 4)
+      expect(store.state.value).toBe(4)
     })
 
     it('warns if accessing another action directly', () => {
@@ -517,14 +506,12 @@ describe('Module', () => {
 
       const store = createStore(root)
 
-      console.error = td.function() as any
+      const spy = jest.spyOn(console, 'error').mockImplementation()
       store.dispatch('b')
 
-      td.verify(
-        console.error(
-          '[vuex-smart-module] You are accessing TestActions#a from TestActions#b but direct access to another action is prohibitted.' +
-            " Access it via this.dispatch('a') instead."
-        )
+      expect(spy).toHaveBeenCalledWith(
+        '[vuex-smart-module] You are accessing TestActions#a from TestActions#b but direct access to another action is prohibitted.' +
+          " Access it via this.dispatch('a') instead."
       )
     })
 
@@ -566,7 +553,7 @@ describe('Module', () => {
         })
         const store = createStore(root)
         await store.dispatch('inc')
-        assert(store.state.value === 2)
+        expect(store.state.value).toBe(2)
       })
 
       it('has actions reference', async () => {
@@ -577,7 +564,7 @@ describe('Module', () => {
         })
         const store = createStore(root)
         await store.dispatch('one')
-        assert(store.state.value === 2)
+        expect(store.state.value).toBe(2)
       })
 
       it('mutation payload is passed correctly', async () => {
@@ -588,7 +575,7 @@ describe('Module', () => {
         })
         const store = createStore(root)
         await store.dispatch('incBy', { value: 2 })
-        assert(store.state.value === 3)
+        expect(store.state.value).toBe(3)
       })
 
       it('dispatch payload is passed correctly', async () => {
@@ -599,7 +586,7 @@ describe('Module', () => {
         })
         const store = createStore(root)
         await store.dispatch('incByTwo')
-        assert(store.state.value === 3)
+        expect(store.state.value).toBe(3)
       })
 
       it('collects parent actions', () => {
@@ -626,9 +613,9 @@ describe('Module', () => {
 
         const store = createStore(root)
         store.dispatch('inc')
-        assert(store.state.value === 2)
+        expect(store.state.value).toBe(2)
         store.dispatch('doubleInc')
-        assert(store.state.value === 4)
+        expect(store.state.value).toBe(4)
       })
     })
   })
@@ -652,12 +639,12 @@ describe('Module', () => {
 
       const ctx = foo.context(store)
 
-      assert(ctx.state.value === 1)
-      assert(ctx.getters.double === 2)
+      expect(ctx.state.value).toBe(1)
+      expect(ctx.getters.double).toBe(2)
       ctx.commit('inc', undefined)
-      assert(ctx.state.value === 2)
+      expect(ctx.state.value).toBe(2)
       return ctx.dispatch('inc', undefined).then(() => {
-        assert(ctx.state.value === 3)
+        expect(ctx.state.value).toBe(3)
       })
     })
 
@@ -694,7 +681,7 @@ describe('Module', () => {
 
       const store = createStore(root)
 
-      assert(store.getters['test/triple'] === 3)
+      expect(store.getters['test/triple']).toBe(3)
     })
 
     describe('sinai style dispatch', () => {
@@ -732,7 +719,7 @@ describe('Module', () => {
         const store = createStore(root)
 
         await store.dispatch('test/incByTwo')
-        assert(store.state.foo.value === 3)
+        expect(store.state.foo.value).toBe(3)
       })
     })
 
@@ -771,7 +758,7 @@ describe('Module', () => {
         })
       )
 
-      assert(foo.context(store).getters.test === 1)
+      expect(foo.context(store).getters.test).toBe(1)
     })
   })
 
@@ -810,7 +797,7 @@ describe('Module', () => {
     const store = createStore(root)
 
     store.dispatch('test/incByTwo')
-    assert(store.state.foo.value === 3)
+    expect(store.state.foo.value).toBe(3)
   })
 
   describe('component mappers', () => {
@@ -850,10 +837,10 @@ describe('Module', () => {
           store,
         })
 
-        assert(wrapper.text() === '1')
+        expect(wrapper.text()).toBe('1')
         store.state.foo.value = 2
         await Vue.nextTick()
-        assert(wrapper.text() === '2')
+        expect(wrapper.text()).toBe('2')
       })
 
       it('maps state with object syntax', async () => {
@@ -872,10 +859,10 @@ describe('Module', () => {
           store,
         })
 
-        assert(wrapper.text() === '1')
+        expect(wrapper.text()).toBe('1')
         store.state.foo.value = 2
         await Vue.nextTick()
-        assert(wrapper.text() === '2')
+        expect(wrapper.text()).toBe('2')
       })
 
       it('maps state with mapper function', async () => {
@@ -896,10 +883,10 @@ describe('Module', () => {
           store,
         })
 
-        assert(wrapper.text() === '3')
+        expect(wrapper.text()).toBe('3')
         store.state.foo.value = 2
         await Vue.nextTick()
-        assert(wrapper.text() === '6')
+        expect(wrapper.text()).toBe('6')
       })
     })
 
@@ -918,10 +905,10 @@ describe('Module', () => {
           store,
         })
 
-        assert(wrapper.text() === '2')
+        expect(wrapper.text()).toBe('2')
         store.state.foo.value = 2
         await Vue.nextTick()
-        assert(wrapper.text() === '4')
+        expect(wrapper.text()).toBe('4')
       })
 
       it('maps getters with object syntax', async () => {
@@ -940,10 +927,10 @@ describe('Module', () => {
           store,
         })
 
-        assert(wrapper.text() === '2')
+        expect(wrapper.text()).toBe('2')
         store.state.foo.value = 2
         await Vue.nextTick()
-        assert(wrapper.text() === '4')
+        expect(wrapper.text()).toBe('4')
       })
     })
 
@@ -964,7 +951,7 @@ describe('Module', () => {
 
         const vm: InstanceType<typeof Test> = wrapper.vm
         vm.inc()
-        assert(store.state.foo.value === 2)
+        expect(store.state.foo.value).toBe(2)
       })
 
       it('maps mutations with object syntax', () => {
@@ -985,7 +972,7 @@ describe('Module', () => {
 
         const vm: InstanceType<typeof Test> = wrapper.vm
         vm.increment()
-        assert(store.state.foo.value === 2)
+        expect(store.state.foo.value).toBe(2)
       })
 
       it('maps mutations with mapper function', () => {
@@ -1011,7 +998,7 @@ describe('Module', () => {
 
         const vm: InstanceType<typeof Test> = wrapper.vm
         vm.add(3)
-        assert(store.state.foo.value === 4)
+        expect(store.state.foo.value).toBe(4)
       })
     })
 
@@ -1032,7 +1019,7 @@ describe('Module', () => {
 
         const vm: InstanceType<typeof Test> = wrapper.vm
         return vm.inc().then(() => {
-          assert(store.state.foo.value === 2)
+          expect(store.state.foo.value).toBe(2)
         })
       })
 
@@ -1054,7 +1041,7 @@ describe('Module', () => {
 
         const vm: InstanceType<typeof Test> = wrapper.vm
         return vm.increment().then(() => {
-          assert(store.state.foo.value === 2)
+          expect(store.state.foo.value).toBe(2)
         })
       })
 
@@ -1083,7 +1070,7 @@ describe('Module', () => {
 
         const vm: InstanceType<typeof Test> = wrapper.vm
         return vm.add(3).then(() => {
-          assert(store.state.foo.value === 4)
+          expect(store.state.foo.value).toBe(4)
         })
       })
     })

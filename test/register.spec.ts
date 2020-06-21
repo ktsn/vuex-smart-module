@@ -1,4 +1,3 @@
-import * as assert from 'power-assert'
 import * as Vuex from 'vuex'
 import { createLocalVue } from '@vue/test-utils'
 import {
@@ -36,9 +35,9 @@ describe('registerModule', () => {
     const store = new Vuex.Store<any>({})
     registerModule(store, 'test', 'test', test)
 
-    assert(store.state.test.count === 0)
+    expect(store.state.test.count).toBe(0)
     store.commit('test/inc')
-    assert(store.state.test.count === 1)
+    expect(store.state.test.count).toBe(1)
   })
 
   it('passes module options of vuex', () => {
@@ -53,7 +52,7 @@ describe('registerModule', () => {
       preserveState: true,
     })
 
-    assert(store.state.test.count === 10)
+    expect(store.state.test.count).toBe(10)
   })
 
   it('calls $init hook', (done) => {
@@ -79,6 +78,6 @@ describe('unregisterModule', () => {
     registerModule(store, 'test', 'test', test)
     unregisterModule(store, test)
 
-    assert(store.state.test === undefined)
+    expect(store.state.test).toBe(undefined)
   })
 })

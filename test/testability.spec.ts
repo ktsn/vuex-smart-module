@@ -1,5 +1,4 @@
 import * as Vuex from 'vuex'
-import * as assert from 'power-assert'
 import { Module, Mutations, createStore, Getters, Actions } from '../src'
 import { createLocalVue } from '@vue/test-utils'
 import { inject } from '../src/assets'
@@ -66,7 +65,7 @@ describe('testability', () => {
         count: 5,
       },
     })
-    assert(getters.double === 10)
+    expect(getters.double).toBe(10)
   })
 
   it('tests mutations', () => {
@@ -77,13 +76,13 @@ describe('testability', () => {
       state,
     })
     mutations.inc()
-    assert(state.count === 11)
+    expect(state.count).toBe(11)
   })
 
   it('tests actions', (done) => {
     const actions = inject(TestActions, {
       commit(type: string) {
-        assert(type === 'inc')
+        expect(type).toBe('inc')
         done()
       },
     })
