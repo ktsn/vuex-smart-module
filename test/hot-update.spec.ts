@@ -43,99 +43,127 @@ describe('hotUpdate', () => {
     actions: FooActions,
   })
 
-  let store: Store<any>
-  beforeEach(() => {
-    store = createStore(foo)
-  })
-
-  it('does not update state', () => {
-    expect(store.state.value).toBe(1)
-
-    class NewState {
-      value = 100
-    }
-
-    const newFoo = new Module({
-      state: NewState,
-      getters: FooGetters,
-      mutations: FooMutations,
-      actions: FooActions,
+  describe('hotUpdate function', () => {
+    let store: Store<any>
+    beforeEach(() => {
+      store = createStore(foo)
     })
 
-    hotUpdate(store, newFoo)
+    it('does not update state', () => {
+      expect(store.state.value).toBe(1)
 
-    expect(store.state.value).toBe(1)
-  })
-
-  it('updates a getter', () => {
-    expect(store.getters.double).toBe(2)
-
-    class NewGetters extends Getters<FooState> {
-      get double() {
-        return this.state.value * 20
+      class NewState {
+        value = 100
       }
-    }
 
-    const newFoo = new Module({
-      state: FooState,
-      getters: NewGetters,
-      mutations: FooMutations,
-      actions: FooActions,
+      const newFoo = new Module({
+        state: NewState,
+        getters: FooGetters,
+        mutations: FooMutations,
+        actions: FooActions,
+      })
+
+      hotUpdate(store, newFoo)
+
+      expect(store.state.value).toBe(1)
     })
 
-    hotUpdate(store, newFoo)
+    it('updates a getter', () => {
+      expect(store.getters.double).toBe(2)
 
-    expect(store.getters.double).toBe(20)
+      class NewGetters extends Getters<FooState> {
+        get double() {
+          return this.state.value * 20
+        }
+      }
+
+      const newFoo = new Module({
+        state: FooState,
+        getters: NewGetters,
+        mutations: FooMutations,
+        actions: FooActions,
+      })
+
+      hotUpdate(store, newFoo)
+
+      expect(store.getters.double).toBe(20)
+    })
+
+    it('updates a mutation', () => {
+      store.commit('inc', 1)
+      expect(store.state.value).toBe(2)
+
+      class NewMutations extends Mutations<FooState> {
+        inc(amount: number) {
+          this.state.value += amount * 10
+        }
+      }
+
+      const newFoo = new Module({
+        state: FooState,
+        getters: FooGetters,
+        mutations: NewMutations,
+        actions: FooActions,
+      })
+
+      hotUpdate(store, newFoo)
+
+      store.commit('inc', 1)
+      expect(store.state.value).toBe(12)
+    })
+
+    it('updates an action', () => {
+      store.dispatch('inc', 1)
+      expect(store.state.value).toBe(2)
+
+      class NewActions extends Actions<
+        FooState,
+        FooGetters,
+        FooMutations,
+        FooActions
+      > {
+        inc(amount: number) {
+          this.commit('inc', amount * 10)
+        }
+      }
+
+      const newFoo = new Module({
+        state: FooState,
+        getters: FooGetters,
+        mutations: FooMutations,
+        actions: NewActions,
+      })
+
+      hotUpdate(store, newFoo)
+
+      store.dispatch('inc', 1)
+      expect(store.state.value).toBe(12)
+    })
   })
 
-  it('updates a mutation', () => {
-    store.commit('inc', 1)
-    expect(store.state.value).toBe(2)
+  describe('via getStoreOptions', () => {
+    it('can use store#hotUpdate', () => {
+      const store = new Store(foo.getStoreOptions())
 
-    class NewMutations extends Mutations<FooState> {
-      inc(amount: number) {
-        this.state.value += amount * 10
+      store.commit('inc', 1)
+      expect(store.state.value).toBe(2)
+
+      class NewMutations extends Mutations<FooState> {
+        inc(amount: number) {
+          this.state.value += amount * 10
+        }
       }
-    }
 
-    const newFoo = new Module({
-      state: FooState,
-      getters: FooGetters,
-      mutations: NewMutations,
-      actions: FooActions,
+      const newFoo = new Module({
+        state: FooState,
+        getters: FooGetters,
+        mutations: NewMutations,
+        actions: FooActions,
+      })
+
+      store.hotUpdate(newFoo.getStoreOptions())
+      store.commit('inc', 1)
+      expect(store.state.value).toBe(12)
     })
-
-    hotUpdate(store, newFoo)
-
-    store.commit('inc', 1)
-    expect(store.state.value).toBe(12)
-  })
-
-  it('updates an action', () => {
-    store.dispatch('inc', 1)
-    expect(store.state.value).toBe(2)
-
-    class NewActions extends Actions<
-      FooState,
-      FooGetters,
-      FooMutations,
-      FooActions
-    > {
-      inc(amount: number) {
-        this.commit('inc', amount * 10)
-      }
-    }
-
-    const newFoo = new Module({
-      state: FooState,
-      getters: FooGetters,
-      mutations: FooMutations,
-      actions: NewActions,
-    })
-
-    hotUpdate(store, newFoo)
-
-    store.dispatch('inc', 1)
-    expect(store.state.value).toBe(12)
   })
 })

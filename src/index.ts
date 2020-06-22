@@ -12,12 +12,12 @@ export function createStore(
   rootModule: Module<any, any, any, any, any>,
   options: StoreOptions<any> = {}
 ): Store<any> {
-  const rootModuleOptions = rootModule.getStoreOptions()
+  const { options: rootModuleOptions, injectStore } = rootModule.create([], '')
 
   const store: Store<any> = new Store({
     ...rootModuleOptions,
     ...options,
-    plugins: rootModuleOptions.plugins.concat(options.plugins || []),
+    plugins: [injectStore].concat(options.plugins || []),
   })
 
   return store
