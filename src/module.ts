@@ -133,10 +133,29 @@ export class Module<
   }
 
   getStoreOptions() {
+    const injectStoreActionName = 'vuex-smart-module/injectStore'
     const { options, injectStore } = this.create([], '')
+
+    if (!options.actions) {
+      options.actions = {}
+    }
+    options.actions[injectStoreActionName] = function () {
+      injectStore(this)
+    }
+
+    const plugin = (store: Store<any>) => {
+      store.dispatch(injectStoreActionName)
+
+      const originalHotUpdate = store.hotUpdate
+      store.hotUpdate = (options) => {
+        originalHotUpdate.call(store, options)
+        store.dispatch(injectStoreActionName)
+      }
+    }
+
     return {
       ...options,
-      plugins: [injectStore],
+      plugins: [plugin],
     }
   }
 
