@@ -250,7 +250,8 @@ export class Context<Mod extends Module<any, any, any, any, any>> {
 
   get modules(): ModulesContexts<Mod> {
     const modules = {} as ModulesContexts<Mod>
-    const children = this.moduleOptions.modules
+    const children: Record<string, Module<any, any, any, any, any>> = this
+      .moduleOptions.modules
     if (!children) {
       return modules
     }
@@ -262,7 +263,7 @@ export class Context<Mod extends Module<any, any, any, any, any>> {
           return new Context(
             createLazyContextPosition(child),
             this.store,
-            child
+            child.options
           )
         },
       })

@@ -60,4 +60,27 @@ describe('Nested modules', () => {
     expect(fooCtx.state.value).toBe(4)
     expect(fooCtx.getters.double).toBe(8)
   })
+
+  it("allows to access to nested module's actions and mutations", () => {
+    const root = new Module({
+      modules: {
+        foo,
+      },
+    })
+
+    const store = createStore(root)
+    const ctx = root.context(store)
+    const fooCtx = ctx.modules.foo
+
+    expect(fooCtx.state.value).toBe(1)
+    expect(fooCtx.getters.double).toBe(2)
+
+    fooCtx.mutations.inc(1)
+    expect(fooCtx.state.value).toBe(2)
+    expect(fooCtx.getters.double).toBe(4)
+
+    fooCtx.actions.inc(2)
+    expect(fooCtx.state.value).toBe(4)
+    expect(fooCtx.getters.double).toBe(8)
+  })
 })
