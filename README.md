@@ -220,7 +220,8 @@ class FooActions extends Actions {
 }
 ```
 
-In case of you want to use another module in some module, you can create a module context.
+
+There are no `rootState`, `rootGetters` and `root` options on `dispatch`, `commit` because they are too difficult to type and the code has implicit dependencies to other modules. In case of you want to use another module in some module, you can create a module context.
 
 ```ts
 import { Store } from 'vuex'
