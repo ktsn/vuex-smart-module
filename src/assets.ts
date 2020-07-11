@@ -17,16 +17,31 @@ export function inject<G extends Getters<S>, S>(
   Getters: Class<G>,
   injection: DeepPartial<G & { state: S; getters: G }>
 ): G
+
 export function inject<M extends Mutations<S>, S>(
   Mutations: Class<M>,
   injection: DeepPartial<M & { state: S }>
 ): M
-export function inject<A extends Actions<S, G, any, any>, S, G extends BG<S>>(
+
+export function inject<
+  A extends Actions<S, G, M, A>,
+  S,
+  G extends BG<S>,
+  M extends BM<S>
+>(
   Actions: Class<A>,
   injection: DeepPartial<
-    A & { state: S; getters: G; dispatch: any; commit: any }
+    A & {
+      state: S
+      getters: G
+      dispatch: any
+      commit: any
+      mutations: M
+      actions: A
+    }
   >
 ): A
+
 export function inject<T>(
   F: Class<T>,
   injection: DeepPartial<T> & Record<string, any>

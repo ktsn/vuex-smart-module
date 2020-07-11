@@ -28,6 +28,14 @@ class TestActions extends Actions<
   inc() {
     this.commit('inc', undefined)
   }
+
+  incBypass() {
+    this.actions.inc()
+  }
+
+  incCall() {
+    this.mutations.inc()
+  }
 }
 
 const test = new Module({
@@ -79,13 +87,34 @@ describe('testability', () => {
     expect(state.count).toBe(11)
   })
 
-  it('tests actions', (done) => {
+  it('tests actions', () => {
+    const commit = jest.fn()
     const actions = inject(TestActions, {
-      commit(type: string) {
-        expect(type).toBe('inc')
-        done()
-      },
+      commit,
     })
     actions.inc()
+    expect(commit).toHaveBeenCalledWith('inc', undefined)
+  })
+
+  it('mocks actions in an action', () => {
+    const inc = jest.fn()
+    const actions = inject(TestActions, {
+      actions: {
+        inc,
+      },
+    })
+    actions.incBypass()
+    expect(inc).toHaveBeenCalled()
+  })
+
+  it('mocks mutations in an action', () => {
+    const inc = jest.fn()
+    const actions = inject(TestActions, {
+      mutations: {
+        inc,
+      },
+    })
+    actions.incCall()
+    expect(inc).toHaveBeenCalled()
   })
 })
