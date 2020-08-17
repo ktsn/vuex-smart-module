@@ -21,12 +21,19 @@ class TestMutations extends Mutations<TestState> {
   }
 }
 
+class TestActions extends Actions<TestState, never, TestMutations> {
+  inc() {
+    this.commit('inc')
+  }
+}
+
 let test: Module<TestState, never, TestMutations, any, any>
 
 beforeEach(() => {
   test = new Module({
     state: TestState,
     mutations: TestMutations,
+    actions: TestActions,
   })
 })
 
@@ -38,6 +45,20 @@ describe('registerModule', () => {
     expect(store.state.test.count).toBe(0)
     store.commit('test/inc')
     expect(store.state.test.count).toBe(1)
+  })
+
+  it('prefixes the namespace for calls via a nested module action', () => {
+    const store = new Vuex.Store<any>({})
+    const parent = new Module({
+      modules: {
+        test,
+      },
+    })
+    registerModule(store, 'parent', 'parent', parent)
+
+    expect(store.state.parent.test.count).toBe(0)
+    store.dispatch('parent/test/inc')
+    expect(store.state.parent.test.count).toBe(1)
   })
 
   it('passes module options of vuex', () => {
