@@ -171,7 +171,7 @@ export class Module<
     this.namespace = namespace
 
     const {
-      namespaced,
+      namespaced = true,
       state,
       getters,
       mutations,
@@ -184,8 +184,7 @@ export class Module<
       : Object.keys(modules).reduce(
           (acc, key) => {
             const m = modules[key]
-            const nextNamespaced =
-              m.options.namespaced === undefined ? true : m.options.namespaced
+            const nextNamespaced = m.options.namespaced ?? true
 
             const nextNamespaceKey = nextNamespaced ? key + '/' : ''
 
@@ -211,7 +210,7 @@ export class Module<
 
     return {
       options: {
-        namespaced: namespaced === undefined ? true : namespaced,
+        namespaced,
         state: () => (state ? new state() : {}),
         getters: gettersInstance && gettersInstance.getters,
         mutations: mutationsInstance && mutationsInstance.mutations,
