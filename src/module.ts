@@ -268,29 +268,37 @@ function initGetters<
     return proxy
   }
 
-  traverseDescriptors(Getters.prototype, BaseGetters, (desc, key) => {
-    if (typeof desc.value !== 'function' && !desc.get) {
-      return
-    }
-
-    const methodFn = desc.value
-    const getterFn = desc.get
-
-    options[key] = () => {
-      const proxy =
-        process.env.NODE_ENV === 'production'
-          ? getters
-          : proxyGetters(getters, key)
-
-      if (getterFn) {
-        return getterFn.call(proxy)
+  traverseDescriptors(
+    Getters.prototype,
+    BaseGetters,
+    (desc, key) => {
+      if (typeof desc.value !== 'function' && !desc.get) {
+        return
       }
 
-      if (methodFn) {
-        return methodFn.bind(proxy)
+      const methodFn = desc.value
+      const getterFn = desc.get
+
+      options[key] = () => {
+        const proxy =
+          process.env.NODE_ENV === 'production'
+            ? getters
+            : proxyGetters(getters, key)
+
+        if (getterFn) {
+          return getterFn.call(proxy)
+        }
+
+        if (methodFn) {
+          return methodFn.bind(proxy)
+        }
       }
+    },
+    {
+      constructor: true,
+      $init: true,
     }
-  })
+  )
 
   return {
     getters: options,
@@ -395,19 +403,27 @@ function initActions<
     return proxy
   }
 
-  traverseDescriptors(Actions.prototype, BaseActions, (desc, key) => {
-    if (typeof desc.value !== 'function') {
-      return
-    }
+  traverseDescriptors(
+    Actions.prototype,
+    BaseActions,
+    (desc, key) => {
+      if (typeof desc.value !== 'function') {
+        return
+      }
 
-    options[key] = (_: any, payload: any) => {
-      const proxy =
-        process.env.NODE_ENV === 'production'
-          ? actions
-          : proxyActions(actions, key)
-      return actions[key].call(proxy, payload)
+      options[key] = (_: any, payload: any) => {
+        const proxy =
+          process.env.NODE_ENV === 'production'
+            ? actions
+            : proxyActions(actions, key)
+        return actions[key].call(proxy, payload)
+      }
+    },
+    {
+      constructor: true,
+      $init: true,
     }
-  })
+  )
 
   return {
     actions: options,
