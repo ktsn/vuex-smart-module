@@ -800,6 +800,47 @@ describe('Module', () => {
     expect(store.state.foo.value).toBe(3)
   })
 
+  it('do not produce vuex getter warning with $init', () => {
+    jest.spyOn(console, 'error')
+    const fooSpy = jest.fn()
+    const barSpy = jest.fn()
+
+    class FooGetters extends Getters {
+      $init() {
+        fooSpy()
+      }
+    }
+
+    class BarGetters extends Getters {
+      $init() {
+        barSpy()
+      }
+    }
+
+    const foo = new Module({
+      namespaced: false,
+      getters: FooGetters,
+    })
+
+    const bar = new Module({
+      namespaced: false,
+      getters: BarGetters,
+    })
+
+    const root = new Module({
+      modules: {
+        foo,
+        bar,
+      },
+    })
+
+    createStore(root)
+
+    expect(fooSpy).toHaveBeenCalled()
+    expect(barSpy).toHaveBeenCalled()
+    expect(console.error).not.toHaveBeenCalled()
+  })
+
   describe('component mappers', () => {
     const fooModule = new Module({
       state: FooState,
