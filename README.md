@@ -426,7 +426,7 @@ import { foo } from '@/store/modules/foo'
 
 export default Vue.extend({
   mounted() {
-    const ctx = foo.context(this.store)
+    const ctx = foo.context(this.$store)
 
     // Call `increment` action
     ctx.actions.increment(1)
