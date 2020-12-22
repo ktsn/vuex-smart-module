@@ -179,6 +179,31 @@ describe('Module', () => {
       expect(store.state.foo.bar.value).toBe(2)
       expect(store.state.foo.bar.baz.value).toBe(2)
     })
+
+    it('preserve raw vuex modules option', () => {
+      const foo = new Module({
+        state: FooState,
+      })
+
+      const root = new Module({
+        modules: {
+          foo,
+        },
+      })
+
+      const store = createStore(root, {
+        modules: {
+          bar: {
+            state: {
+              value: 'bar',
+            },
+          },
+        },
+      })
+
+      expect(store.state.foo.value).toBe(1)
+      expect(store.state.bar.value).toBe('bar')
+    })
   })
 
   describe('getters', () => {

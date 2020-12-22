@@ -17,6 +17,10 @@ export function createStore(
   const store: Store<any> = new Store({
     ...rootModuleOptions,
     ...options,
+    modules: {
+      ...rootModuleOptions.modules,
+      ...options.modules,
+    },
     plugins: [injectStore].concat(options.plugins || []),
   })
 
