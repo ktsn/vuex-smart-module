@@ -305,11 +305,10 @@ function initGetters<
     injectStore: (store) => {
       const context = module.context(store)
 
-      if (!getters.hasOwnProperty('__ctx__')) {
-        Object.defineProperty(getters, '__ctx__', {
-          get: () => context,
-        })
-      }
+      Object.defineProperty(getters, '__ctx__', {
+        get: () => context,
+        configurable: true,
+      })
 
       getters.$init(store)
     },
@@ -365,11 +364,10 @@ function initMutations<
     injectStore: (store) => {
       const context = module.context(store)
 
-      if (!mutations.hasOwnProperty('__ctx__')) {
-        Object.defineProperty(mutations, '__ctx__', {
-          get: () => context,
-        })
-      }
+      Object.defineProperty(mutations, '__ctx__', {
+        get: () => context,
+        configurable: true,
+      })
     },
   }
 }
@@ -430,11 +428,10 @@ function initActions<
     injectStore: (store) => {
       const context = module.context(store)
 
-      if (!actions.hasOwnProperty('__ctx__')) {
-        Object.defineProperty(actions, '__ctx__', {
-          get: () => context,
-        })
-      }
+      Object.defineProperty(actions, '__ctx__', {
+        get: () => context,
+        configurable: true,
+      })
 
       actions.$init(store)
     },

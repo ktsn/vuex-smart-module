@@ -760,6 +760,46 @@ describe('Module', () => {
 
       expect(foo.context(store).getters.test).toBe(1)
     })
+
+    it('does not access old store state via ctx', () => {
+      class FooState {
+        test: string | null = null
+      }
+
+      class FooMutations extends Mutations<FooState> {
+        update(value: string) {
+          this.state.test = value
+        }
+      }
+
+      class FooActions extends Actions<
+        FooState,
+        never,
+        FooMutations,
+        FooActions
+      > {
+        update(value: string) {
+          this.mutations.update(value)
+        }
+      }
+
+      const root = new Module({
+        state: FooState,
+        mutations: FooMutations,
+        actions: FooActions,
+      })
+
+      const storeA = createStore(root)
+      expect(storeA.state.test).toBe(null)
+      storeA.dispatch('update', 'a')
+      expect(storeA.state.test).toBe('a')
+
+      const storeB = createStore(root)
+      expect(storeB.state.test).toBe(null)
+      storeB.dispatch('update', 'b')
+      expect(storeA.state.test).toBe('a')
+      expect(storeB.state.test).toBe('b')
+    })
   })
 
   it("can be used in other module's action", () => {
