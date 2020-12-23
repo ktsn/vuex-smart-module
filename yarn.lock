@@ -1381,13 +1381,14 @@ domexception@^2.0.1:
   dependencies:
     webidl-conversions "^5.0.0"
 
-downlevel-dts@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/downlevel-dts/-/downlevel-dts-0.6.0.tgz#1e52db9fa3ad9e3919a36545412f0b41a44289d1"
-  integrity sha512-Jy3ZZcXWPzTn5jJRW5WpdEtIq8+UowWWi5TEBgHHvzw320kouV//2KgVhfcuOpP93KS3UAokTxnZKU4L75kRSQ==
+downlevel-dts@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/downlevel-dts/-/downlevel-dts-0.7.0.tgz#155c24310dad8a4820ad077e64b15a8c461aa932"
+  integrity sha512-tcjGqElN0/oad/LJBlaxmZ3zOYEQOBbGuirKzif8s1jeRiWBdNX9H6OBFlRjOQkosXgV+qSjs4osuGCivyZ4Jw==
   dependencies:
+    semver "^7.3.2"
     shelljs "^0.8.3"
-    typescript "^4.1.0-dev.20200804"
+    typescript "^4.1.0-dev.20201026"
 
 ecc-jsbn@~0.1.1:
   version "0.1.2"
@@ -4347,10 +4348,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@^4.1.0-dev.20200804:
-  version "4.1.0-dev.20200807"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.1.0-dev.20200807.tgz#1d905708391574dfae757e8505e8d23bb9bf8cae"
-  integrity sha512-2b1evQv3vcCtVZugHKSRdw0iBnna4+6G6vPVGhdG68rBBPKA4D7ddpn3JGoDkTc9WueErnWy0BZAQs/WafS2eA==
+typescript@^4.1.0-dev.20201026:
+  version "4.1.0-dev.20201030"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.1.0-dev.20201030.tgz#6c0d5d67bd97545004ced554deb9616f00c16a39"
+  integrity sha512-L73VfJ023OpORF020zpRUERy/TtXMg+IkKHaVArylq7OHoNYOxCurPDx4JvpW+pwWhF+ebdDHZJm28QVY+tJuw==
 
 typescript@~4.0.2:
   version "4.0.5"
