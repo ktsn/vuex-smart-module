@@ -1,6 +1,4 @@
-import * as Vuex from 'vuex'
 import { Module, Mutations, createStore, Getters, Actions } from '../src'
-import { createLocalVue } from '@vue/test-utils'
 import { inject } from '../src/assets'
 
 class TestState {
@@ -44,9 +42,6 @@ const test = new Module({
   mutations: TestMutations,
   actions: TestActions,
 })
-
-const localVue = createLocalVue()
-localVue.use(Vuex)
 
 describe('testability', () => {
   const originalMutations = test.options.mutations

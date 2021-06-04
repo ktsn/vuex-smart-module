@@ -1,4 +1,3 @@
-import Vue from 'vue'
 import {
   ContextPosition,
   getters as namespacedGetters,
@@ -11,6 +10,7 @@ import {
 import { mapValues, get } from './utils'
 import { Module } from './module'
 import { BG, BM, BA, Payload } from './assets'
+import { ComponentPublicInstance } from 'vue'
 
 export type MappedFunction<Fn, R> = undefined extends Payload<Fn>
   ? (payload?: Payload<Fn>) => R
@@ -48,7 +48,7 @@ export class ComponentMapper<
     const pos = this.pos
 
     return createMappedObject(map, (value) => {
-      return function mappedStateComputed(this: Vue) {
+      return function mappedStateComputed(this: ComponentPublicInstance) {
         const state = get(pos.path, this.$store.state)
 
         if (typeof value === 'function') {
@@ -69,7 +69,7 @@ export class ComponentMapper<
     const pos = this.pos
 
     return createMappedObject(map, (value) => {
-      function mappedGetterComputed(this: Vue) {
+      function mappedGetterComputed(this: ComponentPublicInstance) {
         return this.$store.getters[pos.namespace + value]
       }
 
@@ -95,7 +95,10 @@ export class ComponentMapper<
     const pos = this.pos
 
     return createMappedObject(map, (value) => {
-      return function mappedMutationMethod(this: Vue, ...args: any[]) {
+      return function mappedMutationMethod(
+        this: ComponentPublicInstance,
+        ...args: any[]
+      ) {
         const commit = (type: any, payload: any) => {
           return namespacedCommit(this.$store, pos.namespace, type, payload)
         }
@@ -122,7 +125,10 @@ export class ComponentMapper<
     const pos = this.pos
 
     return createMappedObject(map, (value) => {
-      return function mappedActionMethod(this: Vue, ...args: any[]) {
+      return function mappedActionMethod(
+        this: ComponentPublicInstance,
+        ...args: any[]
+      ) {
         const dispatch = (type: any, payload: any) => {
           return namespacedDispatch(this.$store, pos.namespace, type, payload)
         }

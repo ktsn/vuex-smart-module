@@ -1,6 +1,5 @@
-import Vue from 'vue'
 import * as Vuex from 'vuex'
-import { createLocalVue, shallowMount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import {
   createStore,
   Getters,
@@ -10,9 +9,7 @@ import {
   Context,
   createMapper,
 } from '../src'
-
-const localVue = createLocalVue()
-localVue.use(Vuex)
+import { defineComponent, h, nextTick } from 'vue'
 
 describe('Module', () => {
   class FooState {
@@ -930,129 +927,135 @@ describe('Module', () => {
 
     describe('state', () => {
       it('maps state', async () => {
-        const Test = Vue.extend({
+        const Test = defineComponent({
           computed: foo.mapState(['value']),
 
-          render(h): any {
+          render() {
             return h('div', [this.value.toString()])
           },
-        })
+        }) as any
 
         const wrapper = shallowMount(Test, {
-          localVue,
-          store,
+          global: {
+            plugins: [store],
+          },
         })
 
         expect(wrapper.text()).toBe('1')
         store.state.foo.value = 2
-        await Vue.nextTick()
+        await nextTick()
         expect(wrapper.text()).toBe('2')
       })
 
       it('maps state with object syntax', async () => {
-        const Test = Vue.extend({
+        const Test = defineComponent({
           computed: foo.mapState({
             test: 'value',
           }),
 
-          render(h): any {
+          render() {
             return h('div', [this.test.toString()])
           },
         })
 
         const wrapper = shallowMount(Test, {
-          localVue,
-          store,
+          global: {
+            plugins: [store],
+          },
         })
 
         expect(wrapper.text()).toBe('1')
         store.state.foo.value = 2
-        await Vue.nextTick()
+        await nextTick()
         expect(wrapper.text()).toBe('2')
       })
 
       it('maps state with mapper function', async () => {
-        const Test = Vue.extend({
+        const Test = defineComponent({
           computed: foo.mapState({
             value: (state, getters) => {
               return state.value + getters.double
             },
           }),
 
-          render(h): any {
+          render() {
             return h('div', [this.value.toString()])
           },
         })
 
         const wrapper = shallowMount(Test, {
-          localVue,
-          store,
+          global: {
+            plugins: [store],
+          },
         })
 
         expect(wrapper.text()).toBe('3')
         store.state.foo.value = 2
-        await Vue.nextTick()
+        await nextTick()
         expect(wrapper.text()).toBe('6')
       })
     })
 
     describe('getters', () => {
       it('maps getters', async () => {
-        const Test = Vue.extend({
+        const Test = defineComponent({
           computed: foo.mapGetters(['double']),
 
-          render(h): any {
+          render() {
             return h('div', [this.double.toString()])
           },
         })
 
         const wrapper = shallowMount(Test, {
-          localVue,
-          store,
+          global: {
+            plugins: [store],
+          },
         })
 
         expect(wrapper.text()).toBe('2')
         store.state.foo.value = 2
-        await Vue.nextTick()
+        await nextTick()
         expect(wrapper.text()).toBe('4')
       })
 
       it('maps getters with object syntax', async () => {
-        const Test = Vue.extend({
+        const Test = defineComponent({
           computed: foo.mapGetters({
             test: 'double',
           }),
 
-          render(h): any {
+          render() {
             return h('div', [this.test.toString()])
           },
         })
 
         const wrapper = shallowMount(Test, {
-          localVue,
-          store,
+          global: {
+            plugins: [store],
+          },
         })
 
         expect(wrapper.text()).toBe('2')
         store.state.foo.value = 2
-        await Vue.nextTick()
+        await nextTick()
         expect(wrapper.text()).toBe('4')
       })
     })
 
     describe('mutations', () => {
       it('maps mutations', () => {
-        const Test = Vue.extend({
+        const Test = defineComponent({
           methods: foo.mapMutations(['inc']),
 
-          render(h): any {
+          render() {
             return h('div')
           },
         })
 
         const wrapper = shallowMount(Test, {
-          localVue,
-          store,
+          global: {
+            plugins: [store],
+          },
         })
 
         const vm: InstanceType<typeof Test> = wrapper.vm
@@ -1061,19 +1064,20 @@ describe('Module', () => {
       })
 
       it('maps mutations with object syntax', () => {
-        const Test = Vue.extend({
+        const Test = defineComponent({
           methods: foo.mapMutations({
             increment: 'inc',
           }),
 
-          render(h): any {
+          render() {
             return h('div')
           },
         })
 
         const wrapper = shallowMount(Test, {
-          localVue,
-          store,
+          global: {
+            plugins: [store],
+          },
         })
 
         const vm: InstanceType<typeof Test> = wrapper.vm
@@ -1082,7 +1086,7 @@ describe('Module', () => {
       })
 
       it('maps mutations with mapper function', () => {
-        const Test = Vue.extend({
+        const Test = defineComponent({
           methods: foo.mapMutations({
             add: (commit, payload: number) => {
               while (payload > 0) {
@@ -1092,14 +1096,15 @@ describe('Module', () => {
             },
           }),
 
-          render(h): any {
+          render() {
             return h('div')
           },
         })
 
         const wrapper = shallowMount(Test, {
-          localVue,
-          store,
+          global: {
+            plugins: [store],
+          },
         })
 
         const vm: InstanceType<typeof Test> = wrapper.vm
@@ -1110,17 +1115,18 @@ describe('Module', () => {
 
     describe('actions', () => {
       it('maps actions', () => {
-        const Test = Vue.extend({
+        const Test = defineComponent({
           methods: foo.mapActions(['inc']),
 
-          render(h): any {
+          render() {
             return h('div')
           },
         })
 
         const wrapper = shallowMount(Test, {
-          localVue,
-          store,
+          global: {
+            plugins: [store],
+          },
         })
 
         const vm: InstanceType<typeof Test> = wrapper.vm
@@ -1130,19 +1136,20 @@ describe('Module', () => {
       })
 
       it('maps actions with object syntax', () => {
-        const Test = Vue.extend({
+        const Test = defineComponent({
           methods: foo.mapActions({
             increment: 'inc',
           }),
 
-          render(h): any {
+          render() {
             return h('div')
           },
         })
 
         const wrapper = shallowMount(Test, {
-          localVue,
-          store,
+          global: {
+            plugins: [store],
+          },
         })
 
         const vm: InstanceType<typeof Test> = wrapper.vm
@@ -1152,7 +1159,7 @@ describe('Module', () => {
       })
 
       it('maps actions with mapper function', () => {
-        const Test = Vue.extend({
+        const Test = defineComponent({
           methods: foo.mapActions({
             add: (dispatch, payload: number) => {
               const p: Promise<unknown>[] = []
@@ -1164,14 +1171,15 @@ describe('Module', () => {
             },
           }),
 
-          render(h): any {
+          render() {
             return h('div')
           },
         })
 
         const wrapper = shallowMount(Test, {
-          localVue,
-          store,
+          global: {
+            plugins: [store],
+          },
         })
 
         const vm: InstanceType<typeof Test> = wrapper.vm

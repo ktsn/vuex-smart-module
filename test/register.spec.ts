@@ -1,5 +1,4 @@
 import * as Vuex from 'vuex'
-import { createLocalVue } from '@vue/test-utils'
 import {
   Module,
   Mutations,
@@ -7,9 +6,6 @@ import {
   registerModule,
   unregisterModule,
 } from '../src'
-
-const localVue = createLocalVue()
-localVue.use(Vuex)
 
 class TestState {
   count = 0

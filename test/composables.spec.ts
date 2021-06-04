@@ -1,6 +1,6 @@
-import { getCurrentInstance } from '@vue/composition-api'
 import { mount } from 'vue-composable-tester'
-import { Store } from 'vuex'
+import { provide } from 'vue'
+import { Store, storeKey } from 'vuex'
 import {
   Actions,
   createComposable,
@@ -61,7 +61,7 @@ describe('composables', () => {
     it('state', () => {
       const { result } = mount(useFooContext, {
         provider: () => {
-          getCurrentInstance()!.proxy.$store = store
+          provide(storeKey, store)
         },
       })
       expect(result.state.value).toBe(1)
@@ -70,7 +70,7 @@ describe('composables', () => {
     it('getters', () => {
       const { result } = mount(useFooContext, {
         provider: () => {
-          getCurrentInstance()!.proxy.$store = store
+          provide(storeKey, store)
         },
       })
       expect(result.getters.double).toBe(2)
@@ -79,7 +79,7 @@ describe('composables', () => {
     it('mutations', () => {
       const { result } = mount(useFooContext, {
         provider: () => {
-          getCurrentInstance()!.proxy.$store = store
+          provide(storeKey, store)
         },
       })
       expect(result.state.value).toBe(1)
@@ -90,7 +90,7 @@ describe('composables', () => {
     it('actions', async () => {
       const { result } = mount(useFooContext, {
         provider: () => {
-          getCurrentInstance()!.proxy.$store = store
+          provide(storeKey, store)
         },
       })
       expect(result.getters.double).toBe(2)
