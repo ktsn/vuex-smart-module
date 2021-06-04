@@ -725,7 +725,7 @@ describe('Module', () => {
             this.foo = foo.context(store)
           }
 
-          incByTwo(): Promise<void> {
+          incByTwo(): Promise<unknown> {
             return this.foo.actions.incBy({ value: 2 })
           }
         }
@@ -1155,7 +1155,7 @@ describe('Module', () => {
         const Test = Vue.extend({
           methods: foo.mapActions({
             add: (dispatch, payload: number) => {
-              const p: Promise<void>[] = []
+              const p: Promise<unknown>[] = []
               while (payload > 0) {
                 p.push(dispatch('inc', undefined))
                 payload--
