@@ -689,6 +689,13 @@
     semver "^7.3.2"
     tsutils "^3.17.1"
 
+"@vue/composition-api@^1.0.0-rc.10":
+  version "1.0.0-rc.10"
+  resolved "https://registry.yarnpkg.com/@vue/composition-api/-/composition-api-1.0.0-rc.10.tgz#a98e2b810613531bbbbd3b4c0a9fc46198cc931d"
+  integrity sha512-ftm4OU8H1Ipw64gxIVqzlCW9lJrtr9iOJME0/KJ/fWmVGy55Qbd0uIgIttOkCdLL94A5cjTSbJFTQhu9jBDRXw==
+  dependencies:
+    tslib "^2.2.0"
+
 "@vue/test-utils@^1.0.0-beta.29":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@vue/test-utils/-/test-utils-1.2.0.tgz#3bc8c17ed549157275f0aec6b95da40887f7297f"
@@ -4301,7 +4308,7 @@ tslib@^1.8.1:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.11.2.tgz#9c79d83272c9a7aaf166f73915c9667ecdde3cc9"
   integrity sha512-tTSkux6IGPnUGUd1XAZHcpu85MOkIl5zX49pO+jfsie3eP0B6pyhOlLXm3cAC6T7s+euSDDUUV+Acop5WmtkVg==
 
-tslib@^2.0.0:
+tslib@^2.0.0, tslib@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.2.0.tgz#fb2c475977e35e241311ede2693cee1ec6698f5c"
   integrity sha512-gS9GVHRU+RGn5KQM2rllAlR3dU6m7AcpJKdtH8gFvQiC4Otgk98XnmMU+nZenHt/+VhnBPWwgrJsyrdcw6i23w==
@@ -4461,6 +4468,11 @@ verror@1.10.0:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
+
+vue-composable-tester@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/vue-composable-tester/-/vue-composable-tester-0.1.2.tgz#621bfc06e8192132cd3aff573bcf7d9a1f37a59e"
+  integrity sha512-pkNSGCTA0xe84Y6j4J3ehlvWc1sAEPu03i3tRDUj6k9XBVwAxkF+a461W4SsBH01t99B3kNLpKL1TtCzxZbXRg==
 
 vue-template-compiler@^2.6.10:
   version "2.6.12"

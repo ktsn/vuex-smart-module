@@ -397,6 +397,40 @@ export default Vue.extend({
 })
 ```
 
+### Composable Function
+
+If you prefer composition api for binding a store module to a component, you can create a composable function by using `createComposable`.
+
+```ts
+// @/store/modules/foo
+import { Module, createMapper } from 'vuex-smart-module'
+
+// Create module
+export const foo = new Module({
+  // ...
+})
+
+// Create mapper
+export const useFoo = createComposable(foo)
+```
+
+```ts
+import { defineComponent } from '@vue/composition-api'
+
+// Import useFoo
+import { useFoo } from '@/store/modules/foo'
+
+export default defineComponent({
+  setup() {
+    // Get Foo module's context
+    const foo = useFoo()
+
+    console.log(foo.getters.double)
+    foo.dispatch('incrementAsync')
+  }
+})
+```
+
 ### Method Style Access for Actions and Mutations
 
 `this` in an action and a module context have `actions` and `mutations` properties. They contains module actions and mutations in method form. You can use them instead of `dispatch` or `commit` if you prefer method call style over event emitter style.

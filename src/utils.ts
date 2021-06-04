@@ -31,7 +31,7 @@ export function error(message: string): void {
   console.error(`[vuex-smart-module] ${message}`)
 }
 
-export function assert(condition: any, message: string): void {
+export function assert(condition: any, message: string): asserts condition {
   if (!condition) {
     throw new Error(`[vuex-smart-module] ${message}`)
   }
