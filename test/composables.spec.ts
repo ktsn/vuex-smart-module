@@ -34,7 +34,7 @@ describe('composables', () => {
     FooActions
   > {
     inc() {
-      return new Promise((resolve) => {
+      return new Promise<void>((resolve) => {
         setTimeout(() => {
           this.commit('inc', undefined)
           resolve()

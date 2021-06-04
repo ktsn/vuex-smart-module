@@ -65,9 +65,8 @@ type Getters<Mod extends Module<any, any, any, any, any>> = Mod extends Module<
   ? R
   : never
 
-type Mutations<
-  Mod extends Module<any, any, any, any, any>
-> = Mod extends Module<any, any, infer R, any, any> ? R : never
+type Mutations<Mod extends Module<any, any, any, any, any>> =
+  Mod extends Module<any, any, infer R, any, any> ? R : never
 
 type Actions<Mod extends Module<any, any, any, any, any>> = Mod extends Module<
   any,
@@ -79,11 +78,10 @@ type Actions<Mod extends Module<any, any, any, any, any>> = Mod extends Module<
   ? R
   : never
 
-type ModulesContexts<
-  Mod extends Module<any, any, any, any, any>
-> = Mod extends Module<any, any, any, any, infer R>
-  ? { [K in keyof R]: Context<R[K]> }
-  : never
+type ModulesContexts<Mod extends Module<any, any, any, any, any>> =
+  Mod extends Module<any, any, any, any, infer R>
+    ? { [K in keyof R]: Context<R[K]> }
+    : never
 
 export interface ContextPosition {
   path: string[]
@@ -250,8 +248,8 @@ export class Context<Mod extends Module<any, any, any, any, any>> {
 
   get modules(): ModulesContexts<Mod> {
     const modules = {} as ModulesContexts<Mod>
-    const children: Record<string, Module<any, any, any, any, any>> = this
-      .moduleOptions.modules
+    const children: Record<string, Module<any, any, any, any, any>> =
+      this.moduleOptions.modules
     if (!children) {
       return modules
     }

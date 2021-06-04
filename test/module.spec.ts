@@ -41,7 +41,7 @@ describe('Module', () => {
     FooActions
   > {
     inc() {
-      return new Promise((resolve) => {
+      return new Promise<void>((resolve) => {
         setTimeout(() => {
           this.commit('inc', undefined)
           resolve()
@@ -49,7 +49,7 @@ describe('Module', () => {
       })
     }
     incBy(payload: { value: number }) {
-      return new Promise((resolve) => {
+      return new Promise<void>((resolve) => {
         setTimeout(() => {
           this.mutations.incBy(payload)
           resolve()

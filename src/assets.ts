@@ -119,7 +119,7 @@ export class Actions<
    * See: https://github.com/ktsn/vuex-smart-module/issues/30
    */
   protected get actions(): A {
-    return (this.__ctx__.actions as unknown) as A
+    return this.__ctx__.actions as unknown as A
   }
 
   protected get mutations(): Committer<M> {
