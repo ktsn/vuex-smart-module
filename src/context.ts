@@ -33,16 +33,16 @@ export interface Dispatch<A> {
     type: K,
     payload: Payload<A[K]>,
     options?: DispatchOptions
-  ): Promise<any>
+  ): Promise<unknown>
   // type part of payload
   <K extends keyof A>(
     payload: Payload<A[K]> & { type: K },
     options?: DispatchOptions
-  ): Promise<any>
+  ): Promise<unknown>
   // no payload (only actions without parameters)
   <K extends { [K in keyof A]: A[K] extends () => any ? K : never }[keyof A]>(
     type: K
-  ): Promise<any>
+  ): Promise<unknown>
 }
 
 type State<Mod extends Module<any, any, any, any, any>> = Mod extends Module<
@@ -145,7 +145,7 @@ export function dispatch(
   type: any,
   payload: any,
   options?: any
-): Promise<any> {
+): Promise<unknown> {
   return normalizedDispatch(store.dispatch, namespace, type, payload, options)
 }
 

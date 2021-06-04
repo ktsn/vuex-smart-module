@@ -109,10 +109,10 @@ export class ComponentMapper<
 
   mapActions<K extends keyof A>(
     map: K[]
-  ): { [Key in K]: MappedFunction<A[Key], Promise<any>> }
+  ): { [Key in K]: MappedFunction<A[Key], Promise<unknown>> }
   mapActions<T extends Record<string, keyof A>>(
     map: T
-  ): { [Key in keyof T]: MappedFunction<A[T[Key] & keyof A], Promise<any>> }
+  ): { [Key in keyof T]: MappedFunction<A[T[Key] & keyof A], Promise<unknown>> }
   mapActions<
     T extends Record<string, (dispatch: Dispatch<A>, ...args: any[]) => any>
   >(

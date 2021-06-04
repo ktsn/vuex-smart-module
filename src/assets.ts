@@ -113,7 +113,7 @@ export class Actions<
   }
 
   /**
-   * IMPORTANT: Each action type maybe incorrect - return type of all actions should be `Promise<any>`
+   * IMPORTANT: Each action type maybe incorrect - return type of all actions should be `Promise<unknown>`
    * but the ones under `actions` are same as what you declared in this actions class.
    * The reason why we declare the type in such way is to avoid recursive type error.
    * See: https://github.com/ktsn/vuex-smart-module/issues/30
@@ -136,7 +136,7 @@ export type Committer<M> = {
 export type Dispatcher<A> = {
   [K in keyof A]: Payload<A[K]> extends never
     ? never
-    : MappedFunction<A[K], Promise<any>>
+    : MappedFunction<A[K], Promise<unknown>>
 }
 
 // Type aliases for internal use
