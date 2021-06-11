@@ -24,9 +24,10 @@ const baseConfig = {
     globals: {
       vue: 'Vue',
       vuex: 'Vuex',
+      '@vue/composition-api': 'VueCompositionAPI',
     },
   },
-  external: ['vue', 'vuex'],
+  external: ['vue', 'vuex', '@vue/composition-api'],
   plugins: [nodeResolve()],
 }
 
