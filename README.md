@@ -403,14 +403,14 @@ If you prefer composition api for binding a store module to a component, you can
 
 ```ts
 // @/store/modules/foo
-import { Module, createMapper } from 'vuex-smart-module'
+import { Module, createComposable } from 'vuex-smart-module'
 
 // Create module
 export const foo = new Module({
   // ...
 })
 
-// Create mapper
+// Create composable function
 export const useFoo = createComposable(foo)
 ```
 
