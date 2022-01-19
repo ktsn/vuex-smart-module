@@ -10,6 +10,7 @@ import {
   createMapper,
 } from '../src'
 import { defineComponent, h, nextTick } from 'vue'
+import { InitState } from '../src/module'
 
 describe('Module', () => {
   class FooState {
@@ -903,6 +904,89 @@ describe('Module', () => {
     expect(console.error).not.toHaveBeenCalled()
   })
 
+  describe('state initialization', () => {
+    interface ConfigObject {
+      param_1: number
+      param_2: number
+    }
+    class AlternateStateImplemented implements InitState<ConfigObject> {
+      param = 1
+      alternate?: string = undefined
+
+      init(config: ConfigObject): void {
+        this.param = config.param_2
+        this.alternate = 'changed'
+      }
+    }
+
+    it('model component initializes when initial state interface is implemented', () => {
+      class AlternateGetters extends Getters<AlternateStateImplemented> {}
+      class AlternateMutations extends Mutations<AlternateStateImplemented> {}
+      class AlternateActions extends Actions<
+        AlternateStateImplemented,
+        AlternateGetters,
+        AlternateMutations,
+        AlternateActions
+      > {}
+
+      const module = new Module<
+        AlternateStateImplemented,
+        AlternateGetters,
+        AlternateMutations,
+        AlternateActions
+      >({
+        state: AlternateStateImplemented,
+        actions: AlternateActions,
+        getters: AlternateGetters,
+        mutations: AlternateMutations,
+        initState: {
+          param_2: 3,
+        },
+      })
+
+      const store = createStore(module)
+      expect(store.state.param).toBe(3)
+      expect(store.state.alternate).toBe('changed')
+    })
+    it('model component initializes when when initial state interface is not implemented', () => {
+      class AlternateStateUnImplemented implements InitState<ConfigObject> {
+        param = 1
+        alternate?: string = 'unchanged'
+
+        init(_config: ConfigObject): void {
+          expect(_config.param_2).toBe(3)
+        }
+      }
+
+      class AlternateGetters extends Getters<AlternateStateUnImplemented> {}
+      class AlternateMutations extends Mutations<AlternateStateUnImplemented> {}
+      class AlternateActions extends Actions<
+        AlternateStateUnImplemented,
+        AlternateGetters,
+        AlternateMutations,
+        AlternateActions
+      > {}
+
+      const module = new Module<
+        AlternateStateUnImplemented,
+        AlternateGetters,
+        AlternateMutations,
+        AlternateActions
+      >({
+        state: AlternateStateUnImplemented,
+        actions: AlternateActions,
+        getters: AlternateGetters,
+        mutations: AlternateMutations,
+        initState: {
+          param_2: 3,
+        },
+      })
+
+      const store = createStore(module)
+      expect(store.state.param).toBe(1)
+      expect(store.state.alternate).toBe('unchanged')
+    })
+  })
   describe('component mappers', () => {
     const fooModule = new Module({
       state: FooState,

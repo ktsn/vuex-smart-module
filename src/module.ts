@@ -35,6 +35,7 @@ export interface ModuleOptions<
 > {
   namespaced?: boolean
   state?: Class<S>
+  initState?: any
   getters?: Class<G>
   mutations?: Class<M>
   actions?: Class<A>
@@ -44,6 +45,10 @@ export interface ModuleOptions<
 interface ModuleInstance {
   options: VuexModule<any, any>
   injectStore: (store: Store<any>) => void
+}
+
+export interface InitState<T> {
+  init(config: T): void
 }
 
 export class Module<
@@ -173,6 +178,7 @@ export class Module<
     const {
       namespaced = true,
       state,
+      initState,
       getters,
       mutations,
       actions,
@@ -204,6 +210,17 @@ export class Module<
           }
         )
 
+    const isInitStateInstance = (
+      state: object
+    ): state is InitState<unknown> => {
+      return 'init' in state
+    }
+
+    const stateInstance = state ? new state() : {}
+    if (isInitStateInstance(stateInstance)) {
+      stateInstance.init(initState)
+    }
+
     const gettersInstance = getters && initGetters(getters, this)
     const mutationsInstance = mutations && initMutations(mutations, this)
     const actionsInstance = actions && initActions(actions, this)
@@ -211,7 +228,7 @@ export class Module<
     return {
       options: {
         namespaced,
-        state: () => (state ? new state() : {}),
+        state: () => stateInstance,
         getters: gettersInstance && gettersInstance.getters,
         mutations: mutationsInstance && mutationsInstance.mutations,
         actions: actionsInstance && actionsInstance.actions,
