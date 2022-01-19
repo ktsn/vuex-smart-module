@@ -904,12 +904,12 @@ describe('Module', () => {
     expect(console.error).not.toHaveBeenCalled()
   })
 
-  it('init triggers model components when initial state interface is implemented', () => {
+  describe('state initialization', () =>{
     interface ConfigObject {
       param_1: number
       param_2: number
     }
-    class AlternateState implements InitState<ConfigObject> {
+    class AlternateStateImplemented implements InitState<ConfigObject> {
       param = 1
       alternate?: string = undefined
 
@@ -919,23 +919,54 @@ describe('Module', () => {
       }
     }
 
-    class AlternateGetters extends Getters<AlternateState>{}
-    class AlternateMutations extends Mutations<AlternateState>{}
-    class AlternateActions extends Actions<AlternateState,AlternateGetters, AlternateMutations, AlternateActions>{}
+    it('model component initializes when initial state interface is implemented', () => {
 
-    const module = new Module<AlternateState, AlternateGetters, AlternateMutations, AlternateActions>({
-      state: AlternateState,
-      actions: AlternateActions,
-      getters: AlternateGetters,
-      mutations: AlternateMutations,
-      initState: {
-        param_2: 3,
-      }
+      class AlternateGetters extends Getters<AlternateStateImplemented>{}
+      class AlternateMutations extends Mutations<AlternateStateImplemented>{}
+      class AlternateActions extends Actions<AlternateStateImplemented,AlternateGetters, AlternateMutations, AlternateActions>{}
+
+      const module = new Module<AlternateStateImplemented, AlternateGetters, AlternateMutations, AlternateActions>({
+        state: AlternateStateImplemented,
+        actions: AlternateActions,
+        getters: AlternateGetters,
+        mutations: AlternateMutations,
+        initState: {
+          param_2: 3,
+        }
+      })
+
+      const store = createStore(module)
+      expect(store.state.param).toBe(3)
+      expect(store.state.alternate).toBe('changed')
     })
+    it('model component initializes when when initial state interface is not implemented', () => {
+      class AlternateStateUnImplemented implements InitState<ConfigObject> {
+        param = 1
+        alternate?: string = 'unchanged'
+  
+        init(_config: ConfigObject): void {
+          expect(_config.param_2).toBe(3)
+        }
+      }
 
-    const store = createStore(module)
-    expect(store.state.param).toBe(3)
-    expect(store.state.alternate).toBe('changed')
+      class AlternateGetters extends Getters<AlternateStateUnImplemented>{}
+      class AlternateMutations extends Mutations<AlternateStateUnImplemented>{}
+      class AlternateActions extends Actions<AlternateStateUnImplemented,AlternateGetters, AlternateMutations, AlternateActions>{}
+
+      const module = new Module<AlternateStateUnImplemented, AlternateGetters, AlternateMutations, AlternateActions>({
+        state: AlternateStateUnImplemented,
+        actions: AlternateActions,
+        getters: AlternateGetters,
+        mutations: AlternateMutations,
+        initState: {
+          param_2: 3,
+        }
+      })
+
+      const store = createStore(module)
+      expect(store.state.param).toBe(1)
+      expect(store.state.alternate).toBe('unchanged')
+    })
   })
   describe('component mappers', () => {
     const fooModule = new Module({
