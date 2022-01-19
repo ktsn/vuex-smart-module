@@ -10,6 +10,7 @@ import {
   createMapper,
 } from '../src'
 import { defineComponent, h, nextTick } from 'vue'
+import { InitState } from '../src/module'
 
 describe('Module', () => {
   class FooState {
@@ -903,6 +904,39 @@ describe('Module', () => {
     expect(console.error).not.toHaveBeenCalled()
   })
 
+  it('init triggers model components when initial state interface is implemented', () => {
+    interface ConfigObject {
+      param_1: number
+      param_2: number
+    }
+    class AlternateState implements InitState<ConfigObject> {
+      param = 1
+      alternate?: string = undefined
+
+      init(config: ConfigObject): void {
+        this.param = config.param_2
+        this.alternate = 'changed'
+      }
+    }
+
+    class AlternateGetters extends Getters<AlternateState>{}
+    class AlternateMutations extends Mutations<AlternateState>{}
+    class AlternateActions extends Actions<AlternateState,AlternateGetters, AlternateMutations, AlternateActions>{}
+
+    const module = new Module<AlternateState, AlternateGetters, AlternateMutations, AlternateActions>({
+      state: AlternateState,
+      actions: AlternateActions,
+      getters: AlternateGetters,
+      mutations: AlternateMutations,
+      initState: {
+        param_2: 3,
+      }
+    })
+
+    const store = createStore(module)
+    expect(store.state.param).toBe(3)
+    expect(store.state.alternate).toBe('changed')
+  })
   describe('component mappers', () => {
     const fooModule = new Module({
       state: FooState,
