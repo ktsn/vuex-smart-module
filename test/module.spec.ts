@@ -904,7 +904,7 @@ describe('Module', () => {
     expect(console.error).not.toHaveBeenCalled()
   })
 
-  describe('state initialization', () =>{
+  describe('state initialization', () => {
     interface ConfigObject {
       param_1: number
       param_2: number
@@ -920,19 +920,28 @@ describe('Module', () => {
     }
 
     it('model component initializes when initial state interface is implemented', () => {
+      class AlternateGetters extends Getters<AlternateStateImplemented> {}
+      class AlternateMutations extends Mutations<AlternateStateImplemented> {}
+      class AlternateActions extends Actions<
+        AlternateStateImplemented,
+        AlternateGetters,
+        AlternateMutations,
+        AlternateActions
+      > {}
 
-      class AlternateGetters extends Getters<AlternateStateImplemented>{}
-      class AlternateMutations extends Mutations<AlternateStateImplemented>{}
-      class AlternateActions extends Actions<AlternateStateImplemented,AlternateGetters, AlternateMutations, AlternateActions>{}
-
-      const module = new Module<AlternateStateImplemented, AlternateGetters, AlternateMutations, AlternateActions>({
+      const module = new Module<
+        AlternateStateImplemented,
+        AlternateGetters,
+        AlternateMutations,
+        AlternateActions
+      >({
         state: AlternateStateImplemented,
         actions: AlternateActions,
         getters: AlternateGetters,
         mutations: AlternateMutations,
         initState: {
           param_2: 3,
-        }
+        },
       })
 
       const store = createStore(module)
@@ -943,24 +952,34 @@ describe('Module', () => {
       class AlternateStateUnImplemented implements InitState<ConfigObject> {
         param = 1
         alternate?: string = 'unchanged'
-  
+
         init(_config: ConfigObject): void {
           expect(_config.param_2).toBe(3)
         }
       }
 
-      class AlternateGetters extends Getters<AlternateStateUnImplemented>{}
-      class AlternateMutations extends Mutations<AlternateStateUnImplemented>{}
-      class AlternateActions extends Actions<AlternateStateUnImplemented,AlternateGetters, AlternateMutations, AlternateActions>{}
+      class AlternateGetters extends Getters<AlternateStateUnImplemented> {}
+      class AlternateMutations extends Mutations<AlternateStateUnImplemented> {}
+      class AlternateActions extends Actions<
+        AlternateStateUnImplemented,
+        AlternateGetters,
+        AlternateMutations,
+        AlternateActions
+      > {}
 
-      const module = new Module<AlternateStateUnImplemented, AlternateGetters, AlternateMutations, AlternateActions>({
+      const module = new Module<
+        AlternateStateUnImplemented,
+        AlternateGetters,
+        AlternateMutations,
+        AlternateActions
+      >({
         state: AlternateStateUnImplemented,
         actions: AlternateActions,
         getters: AlternateGetters,
         mutations: AlternateMutations,
         initState: {
           param_2: 3,
-        }
+        },
       })
 
       const store = createStore(module)
