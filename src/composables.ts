@@ -1,4 +1,4 @@
-import { getCurrentInstance } from '@vue/composition-api'
+import { getCurrentInstance } from 'vue-demi'
 import { Module } from './module'
 import { assert } from './utils'
 
