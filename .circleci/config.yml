@@ -3,7 +3,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/working/repo
   docker:
-    - image: circleci/node:10-browsers
+    - image: circleci/node:16-browsers
 
 jobs:
   install:
@@ -14,16 +14,16 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v2-dependencies-{{ checksum "yarn.lock" }}
+            - v3-dependencies-{{ checksum "yarn.lock" }}
             # fallback to using the latest cache if no exact match is found
-            - v2-dependencies-
+            - v3-dependencies-
 
       - run: npm install
 
       - save_cache:
           paths:
             - node_modules
-          key: v2-dependencies-{{ checksum "yarn.lock" }}
+          key: v3-dependencies-{{ checksum "yarn.lock" }}
 
       - persist_to_workspace:
           root: ~/working
