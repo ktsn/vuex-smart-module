@@ -141,7 +141,7 @@ function createMappedObject(
 ): Record<string, any> {
   const normalized = !Array.isArray(map)
     ? map
-    : map.reduce<Record<string, string>>((acc, key) => {
+    : (map as string[]).reduce<Record<string, string>>((acc, key) => {
         acc[key] = key
         return acc
       }, {})

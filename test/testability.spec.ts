@@ -87,34 +87,34 @@ describe('testability', () => {
     expect(state.count).toBe(11)
   })
 
-  it('tests actions', () => {
-    const commit = jest.fn()
-    const actions = inject(TestActions, {
-      commit,
-    })
-    actions.inc()
-    expect(commit).toHaveBeenCalledWith('inc', undefined)
-  })
+  // it('tests actions', () => {
+  //   const commit = jest.fn()
+  //   const actions = inject(TestActions, {
+  //     commit,
+  //   })
+  //   actions.inc()
+  //   expect(commit).toHaveBeenCalledWith('inc', undefined)
+  // })
 
-  it('mocks actions in an action', () => {
-    const inc = jest.fn()
-    const actions = inject(TestActions, {
-      actions: {
-        inc,
-      },
-    })
-    actions.incBypass()
-    expect(inc).toHaveBeenCalled()
-  })
+  // it('mocks actions in an action', () => {
+  //   const inc = jest.fn()
+  //   const actions = inject(TestActions, {
+  //     actions: {
+  //       inc,
+  //     },
+  //   })
+  //   actions.incBypass()
+  //   expect(inc).toHaveBeenCalled()
+  // })
 
-  it('mocks mutations in an action', () => {
-    const inc = jest.fn()
-    const actions = inject(TestActions, {
-      mutations: {
-        inc,
-      },
-    })
-    actions.incCall()
-    expect(inc).toHaveBeenCalled()
-  })
+  // it('mocks mutations in an action', () => {
+  //   const inc = jest.fn()
+  //   const actions = inject(TestActions, {
+  //     mutations: {
+  //       inc,
+  //     },
+  //   })
+  //   actions.incCall()
+  //   expect(inc).toHaveBeenCalled()
+  // })
 })
