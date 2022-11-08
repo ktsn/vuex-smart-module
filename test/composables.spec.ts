@@ -1,4 +1,4 @@
-import { getCurrentInstance } from '@vue/composition-api'
+import { getCurrentInstance } from 'vue'
 import { mount } from 'vue-composable-tester'
 import { Store } from 'vuex'
 import {
